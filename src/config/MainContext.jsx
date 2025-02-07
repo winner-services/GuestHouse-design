@@ -41,17 +41,26 @@ const MainProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            // await axios.post('/api/logout');
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            localStorage.removeItem('permissions');
-            localStorage.removeItem('role');
-            setUser(null);
-            setPermissions([]);
-            setIsAuthenticated(false);
-            window.location.reload();
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/auth/logout`, {
+                method: 'GET',
+                headers: headerRequest
+            });
+            const res = await response.json();
+            if (res.status == 200) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                localStorage.removeItem('permissions');
+                localStorage.removeItem('role');
+                setUser(null);
+                setPermissions([]);
+                setIsAuthenticated(false);
+                location.href = "/"
+            }
+            setLoader(false)
         } catch (error) {
             console.error(error); // Handle logout errors gracefully
+            setLoader(false)
         }
     };
 

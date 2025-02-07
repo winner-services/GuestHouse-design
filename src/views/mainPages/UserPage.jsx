@@ -52,6 +52,43 @@ function UserPage() {
         }
     };
 
+    const modalValidateUser = (model) => {
+        Swal.fire({
+            title: "Etes-vous sûr?",
+            text: "Une fois effectué, cette operation ne peut pas etre annulée.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: `Oui, ${model.status=='Validated'?'Valider':'Rejeter'}!`,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                let url = `auth/activateUser/${model.id}`
+                if (model.status == 'Rejected') {
+                    url = `auth/suspendUser/${model.id}`
+                }
+                setLoader(true)
+                const response = await fetch(`${BaseUrl}/${url}`, {
+                    method: 'PUT',
+                    headers: headerRequest,
+                    body: JSON.stringify(model)
+                });
+                const res = await response.json();
+                if (res.success) {
+                    getData()
+                    Swal.fire(`${model.status=='Validated'?'Validée':'Rejetée'}`, `Une commande a été ${model.status=='Validated'?'Validée':'Rejetée'}`, 'success')
+                }
+                setLoader(false)
+            } else {
+                setLoader(false)
+            }
+        }).catch((error) => {
+            console.error("ERROR:", error);
+            Swal.fire("Erreur", 'Veiller reessayer', 'error')
+            setLoader(false)
+        })
+    }
+
     const getResult = (pages) => {
 
         if (!pages) {
@@ -103,9 +140,9 @@ function UserPage() {
                                     <th className="fixed-width"> #</th>
                                     <th className="h6 text-gray-300">Nom</th>
                                     <th className="h6 text-gray-300">Genre</th>
-                                    <th className="h6 text-gray-300">Addresse</th>
                                     <th className="h6 text-gray-300">Telephone</th>
                                     <th className="h6 text-gray-300">Email</th>
+                                    <th className="h6 text-gray-300">Etat</th>
                                     <th className="h6 text-gray-300">Actions</th>
                                 </tr>
                             </thead>
@@ -116,13 +153,17 @@ function UserPage() {
                                         <tr key={index}>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.name}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.gender == "M" ? 'Masculin' : 'Feminin'}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.address}</span></td>
+                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.gender == "Masculin" ? 'Masculin' : 'Féminin'}</span></td>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.phone}</span></td>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.email}</span></td>
                                             <td>
-                                                <button className="btn btn-main p-9 me-1" onClick={() => modelDette(item)}><i className="ph ph-pen text-white"></i></button>
-                                                <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
+                                                {item.active==0?<span class="plan-badge py-4 px-16 bg-info-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Suspendu</span>:''}
+                                                {item.active==1?<span class="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Activé</span>:''}
+                                            </td>
+                                            <td>
+                                                <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
+                                                <button className="btn btn-success p-9 me-1" onClick={() => modalValidateUser({id:item.id, status:"Validated"})}><i className="ph ph-user-check text-white"></i></button>
+                                                <button className="btn btn-danger p-9" onClick={() => modalValidateUser({id:item.id, status:"Rejected"})}><i className="ph ph-trash text-white"></i></button>
                                             </td>
                                         </tr>
                                     ))

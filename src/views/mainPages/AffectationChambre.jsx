@@ -17,7 +17,7 @@ function AffectationChambre() {
     const [singleChambre, setSingleChambre] = useState({});
     const [room_operation, setRoomOps] = useState(0);
     const [form, setForm] = useState({
-        costumer_id:""
+        costumer_id: ""
     })
 
     const hideAllForms = () => {
@@ -46,7 +46,7 @@ function AffectationChambre() {
                 setData(res.data.data);
                 setEntries(res.data);
                 setDeviseData(res.devise)
-                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type=='devise_principale')[0])
+                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type == 'devise_principale')[0])
             }
             setLoader(false)
         } catch (error) {
@@ -110,16 +110,16 @@ function AffectationChambre() {
                     <div className="position-relative text-gray-500 flex-align gap-4 text-13"></div>
                     <div
                         className="flex-align text-gray-500 text-13 border border-gray-100">
-                            <div className="dropdown me-1">
-                                <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {deviseValue?deviseValue.symbol:''}
-                                </button>
-                                <ul className="dropdown-menu">
-                                    {deviseData.map((item,index)=>(
-                                        <li key={index}><a className="dropdown-item" type="button" href="#" onClick={() => changeDevise(item)}>{item.symbol}</a></li>
-                                    ))}
-                                </ul>
-                            </div>
+                        <div className="dropdown me-1">
+                            <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {deviseValue ? deviseValue.symbol : ''}
+                            </button>
+                            <ul className="dropdown-menu">
+                                {deviseData.map((item, index) => (
+                                    <li key={index}><a className="dropdown-item" type="button" href="#" onClick={() => changeDevise(item)}>{item.symbol}</a></li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 {/* Breadcrumb Right End */}
@@ -128,13 +128,29 @@ function AffectationChambre() {
 
             <div className="card overflow-hidden">
                 <div className="card-body p-0 overflow-x-auto">
+                    <div className="row g-20 p-30" >
+                        <i style={{marginTop:0, fontWeight:'bold'}}>* Legende: </i>
+                        <div className="d-flex" style={{alignItems:'center', marginTop:0}}>
+                            <i className="bg-main-100 rounded-8 me-2" style={{width:40, height:20}}></i>
+                            <span> : Chambres Libres</span>
+                        </div>
+                        <div className="d-flex" style={{alignItems:'center', marginTop:0}}>
+                            <i className="bg-success-100 rounded-8 me-2" style={{width:40, height:20}}></i>
+                            <span> : Chambres Occupées</span>
+                        </div>
+                        <div className="d-flex" style={{alignItems:'center', marginTop:0}}>
+                            <i className="bg-warning-100 rounded-8 me-2" style={{width:40, height:20}}></i>
+                            <span> : Chambres Reservées</span>
+                        </div>
+                        
+                    </div>
                     <div className="row g-20 p-3">
-                        {data.map((item,index)=>(
-                            <div  key={index} className="col-lg-2 col-sm-3">
+                        {data.map((item, index) => (
+                            <div key={index} className="col-lg-2 col-sm-3">
                                 <div className="card border border-gray-100">
                                     <div className="card-body p-8">
                                         <a href="#" onClick={() => showAffectationModel(item)}
-                                            className={`bg-${item.status=='Libre'?'main':item.status=='Occupée'?'success':item.status=='Réservée'?'warning':''}-100 rounded-8 overflow-hidden text-left mb-8 h-164 flex-center p-8`}>
+                                            className={`bg-${item.status == 'Libre' ? 'main' : item.status == 'Occupée' ? 'success' : item.status == 'Réservée' ? 'warning' : ''}-100 rounded-8 overflow-hidden text-left mb-8 h-164 flex-center p-8`}>
                                             {item.designation} - {item.categorie}<br />
                                             Prix: {get_net_value(item.unite_price)}
                                         </a>
@@ -151,38 +167,42 @@ function AffectationChambre() {
 
         <Modal show={formVisible} onHide={hideForm} backdrop="static">
             <Modal.Header closeButton>
-                <Modal.Title style={{marginBottom:0}}>Chambre : {singleChambre.designation}  - {singleChambre.categorie}<br/>
-                <small style={{fontSize:15, fontWeight:'normal'}}>Prix: {get_net_value(singleChambre.unite_price)}</small><br /> 
-                <small style={{fontSize:15, fontWeight:'normal'}}>Etat: {singleChambre.status}</small> 
-            </Modal.Title>
+                <Modal.Title style={{ marginBottom: 0 }}>Chambre : {singleChambre.designation}  - {singleChambre.categorie}<br />
+                    <small style={{ fontSize: 15, fontWeight: 'normal' }}>Prix: {get_net_value(singleChambre.unite_price)}</small><br />
+                    <small style={{ fontSize: 15, fontWeight: 'normal' }}>Etat: {singleChambre.status}</small>
+                </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {room_operation == 0?<>
+                {room_operation == 0 ? <>
                     <div className="col-sm-12 col-xs-12 mb-8">
                         <ul class="list-group">
-                            <li class="list-group-item"><a href="#" onClick={() => setRoomOps(1)}>Attribuer la chambre</a></li>
-                            <li class="list-group-item"><a href="#" onClick={() => setRoomOps(2)}>Reserver la chambre</a></li>
-                            <li class="list-group-item"><a href="#" onClick={() => setRoomOps(3)}>Transferer le client</a></li>
-                            <li class="list-group-item"><a href="#" onClick={() => setRoomOps(4)}>Cloturer le sejour du client</a></li>
+                            {singleChambre.status == 'Libre' || singleChambre.status == 'Réservée'?<>
+                                <li class="list-group-item"><a href="#" onClick={() => setRoomOps(1)}>Attribuer la chambre</a></li>
+                                <li class="list-group-item"><a href="#" onClick={() => setRoomOps(2)}>Reserver la chambre</a></li>
+                            </>:null}
+                            {singleChambre.status == 'Occupée'?<>
+                                <li class="list-group-item"><a href="#" onClick={() => setRoomOps(3)}>Transferer le client</a></li>
+                                <li class="list-group-item"><a href="#" onClick={() => setRoomOps(4)}>Cloturer le sejour du client</a></li>
+                             </>:null}
                         </ul>
                     </div>
                     <div className="col-sm-12">
                         <button className="btn btn-outline-danger bg-danger-100 border-danger-100 text-danger-600 rounded-pill py-9 me-1" onClick={hideForm}>Annuler</button>
                     </div>
-                </>:room_operation == 1? 
-                (
-                    <AttributionChambreForm hideForm={hideAllForms} singleRoom={singleChambre}/>
-                ):room_operation == 2? 
-                (
-                    <ReservationChambreForm hideForm={hideAllForms} singleRoom={singleChambre}/>
-                ):room_operation == 3? 
-                (
-                    <TransfertChambreForm hideForm={hideAllForms} singleRoom={singleChambre}/>
-                ):room_operation == 4? 
-                (
-                    <ClotureChambre hideForm={hideAllForms} singleRoom={singleChambre}/>
-                ):''}
-                
+                </> : room_operation == 1 ?
+                    (
+                        <AttributionChambreForm hideForm={hideAllForms} singleRoom={singleChambre} />
+                    ) : room_operation == 2 ?
+                        (
+                            <ReservationChambreForm hideForm={hideAllForms} singleRoom={singleChambre} />
+                        ) : room_operation == 3 ?
+                            (
+                                <TransfertChambreForm hideForm={hideAllForms} singleRoom={singleChambre} />
+                            ) : room_operation == 4 ?
+                                (
+                                    <ClotureChambre hideForm={hideAllForms} singleRoom={singleChambre} />
+                                ) : ''}
+
             </Modal.Body>
         </Modal>
     </>

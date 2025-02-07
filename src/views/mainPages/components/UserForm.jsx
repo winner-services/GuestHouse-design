@@ -10,7 +10,8 @@ function UserForm({ hideForm, singleClient }) {
         address: "",
         email: "",
         password:"",
-        role_id:""
+        role_id:null,
+        service_id:null
     })
 
     const { setLoader } = useContext(MainContext);
@@ -161,7 +162,7 @@ function UserForm({ hideForm, singleClient }) {
                                         <select className="form-control py-11" value={form.gender} onChange={(e) => { setForm({ ...form, gender: e.target.value }) }}>
                                             <option hidden>Selectionner une option</option>
                                             <option value="Masculin">Masculin</option>
-                                            <option value="Feminin">Feminin</option>
+                                            <option value="Féminin">Féminin</option>
                                         </select>
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
