@@ -5,6 +5,7 @@ import AttributionChambreForm from "./components/chambre/AttributionChambreForm"
 import ReservationChambreForm from "./components/chambre/ReservationChambreForm";
 import TransfertChambreForm from "./components/chambre/TransfertChambreForm";
 import ClotureChambre from "./components/chambre/ClotureChambre";
+import { Dropdown } from 'react-bootstrap';
 
 function AffectationChambre() {
     const [formVisible, setFormVisible] = useState(false)
@@ -110,16 +111,19 @@ function AffectationChambre() {
                     <div className="position-relative text-gray-500 flex-align gap-4 text-13"></div>
                     <div
                         className="flex-align text-gray-500 text-13 border border-gray-100">
-                        <div className="dropdown me-1">
-                            <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <Dropdown className="me-1">
+                            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
                                 {deviseValue ? deviseValue.symbol : ''}
-                            </button>
-                            <ul className="dropdown-menu">
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
                                 {deviseData.map((item, index) => (
-                                    <li key={index}><a className="dropdown-item" type="button" href="#" onClick={() => changeDevise(item)}>{item.symbol}</a></li>
+                                    <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
+                                        {item.symbol}
+                                    </Dropdown.Item>
                                 ))}
-                            </ul>
-                        </div>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </div>
                 </div>
                 {/* Breadcrumb Right End */}
@@ -129,20 +133,20 @@ function AffectationChambre() {
             <div className="card overflow-hidden">
                 <div className="card-body p-0 overflow-x-auto">
                     <div className="row g-20 p-30" >
-                        <i style={{marginTop:0, fontWeight:'bold'}}>* Legende: </i>
-                        <div className="d-flex" style={{alignItems:'center', marginTop:0}}>
-                            <i className="bg-main-100 rounded-8 me-2" style={{width:40, height:20}}></i>
+                        <i style={{ marginTop: 0, fontWeight: 'bold' }}>* Legende: </i>
+                        <div className="d-flex" style={{ alignItems: 'center', marginTop: 0 }}>
+                            <i className="bg-main-100 rounded-8 me-2" style={{ width: 40, height: 20 }}></i>
                             <span> : Chambres Libres</span>
                         </div>
-                        <div className="d-flex" style={{alignItems:'center', marginTop:0}}>
-                            <i className="bg-success-100 rounded-8 me-2" style={{width:40, height:20}}></i>
+                        <div className="d-flex" style={{ alignItems: 'center', marginTop: 0 }}>
+                            <i className="bg-success-100 rounded-8 me-2" style={{ width: 40, height: 20 }}></i>
                             <span> : Chambres Occupées</span>
                         </div>
-                        <div className="d-flex" style={{alignItems:'center', marginTop:0}}>
-                            <i className="bg-warning-100 rounded-8 me-2" style={{width:40, height:20}}></i>
+                        <div className="d-flex" style={{ alignItems: 'center', marginTop: 0 }}>
+                            <i className="bg-warning-100 rounded-8 me-2" style={{ width: 40, height: 20 }}></i>
                             <span> : Chambres Reservées</span>
                         </div>
-                        
+
                     </div>
                     <div className="row g-20 p-3">
                         {data.map((item, index) => (
@@ -175,15 +179,15 @@ function AffectationChambre() {
             <Modal.Body>
                 {room_operation == 0 ? <>
                     <div className="col-sm-12 col-xs-12 mb-8">
-                        <ul class="list-group">
-                            {singleChambre.status == 'Libre' || singleChambre.status == 'Réservée'?<>
-                                <li class="list-group-item"><a href="#" onClick={() => setRoomOps(1)}>Attribuer la chambre</a></li>
-                                <li class="list-group-item"><a href="#" onClick={() => setRoomOps(2)}>Reserver la chambre</a></li>
-                            </>:null}
-                            {singleChambre.status == 'Occupée'?<>
-                                <li class="list-group-item"><a href="#" onClick={() => setRoomOps(3)}>Transferer le client</a></li>
-                                <li class="list-group-item"><a href="#" onClick={() => setRoomOps(4)}>Cloturer le sejour du client</a></li>
-                             </>:null}
+                        <ul className="list-group">
+                            {singleChambre.status == 'Libre' || singleChambre.status == 'Réservée' ? <>
+                                <li className="list-group-item"><a href="#" onClick={() => setRoomOps(1)}>Attribuer la chambre</a></li>
+                                <li className="list-group-item"><a href="#" onClick={() => setRoomOps(2)}>Reserver la chambre</a></li>
+                            </> : null}
+                            {singleChambre.status == 'Occupée' ? <>
+                                <li className="list-group-item"><a href="#" onClick={() => setRoomOps(3)}>Transferer le client</a></li>
+                                <li className="list-group-item"><a href="#" onClick={() => setRoomOps(4)}>Cloturer le sejour du client</a></li>
+                            </> : null}
                         </ul>
                     </div>
                     <div className="col-sm-12">

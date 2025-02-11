@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import '../pagination/Pagination.css'; // Import your CSS file (optional)
+import './Pagination-style.css';
 
 const Pagination = ({ data, showDisabled = true, limit = 5, onPageChange }) => {
   const [currentPage, setCurrentPage] = useState(null);
@@ -83,7 +83,7 @@ const Pagination = ({ data, showDisabled = true, limit = 5, onPageChange }) => {
       {data && (
         <ul className="pagination justify-content-center pagination-sm">
           <li
-            className={`page-item disabled ${!data.prev_page_url && showDisabled ? 'disabled' : ''}`}
+            className={`page-item ${!data.prev_page_url ? 'disabled' : ''}`}
           >
             <a
               href="#"
@@ -99,12 +99,12 @@ const Pagination = ({ data, showDisabled = true, limit = 5, onPageChange }) => {
             <li key={key} className={`page-item ${page === currentPage ? 'active' : ''}`}>
               <a href="#" className="page-link" onClick={() => handleSelectPage(page)}>
                 {page}
-                {page === currentPage && <span className="sr-only">(current)</span>}
+                {page === currentPage && <span className="sr-only"></span>}
               </a>
             </li>
           ))}
           <li
-            className={`page-item disabled ${!data.next_page_url && showDisabled ? 'disabled' : ''}`}
+            className={`page-item ${!data.next_page_url ? 'disabled' : ''}`}
           >
             <a
               href="#"

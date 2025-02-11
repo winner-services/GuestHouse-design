@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../../config/MainContext";
+import { Dropdown } from 'react-bootstrap';
 
 function ApprovisionnementViewmore({ hideForm, singleClient }) {
     const [data, setData] = useState([])
@@ -19,7 +20,7 @@ function ApprovisionnementViewmore({ hideForm, singleClient }) {
             if (res.data) {
                 setData(res.data);
                 setDeviseData(res.devise)
-                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type=='devise_principale')[0])
+                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type == 'devise_principale')[0])
             }
             setLoader(false)
         } catch (error) {
@@ -61,16 +62,19 @@ function ApprovisionnementViewmore({ hideForm, singleClient }) {
                 <div className="flex-align gap-8 flex-wrap">
                     <div
                         className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
-                            <div className="dropdown me-1">
-                                <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {deviseValue?deviseValue.symbol:''}
-                                </button>
-                                <ul className="dropdown-menu">
-                                    {deviseData.map((item,index)=>(
-                                        <li key={index}><a className="dropdown-item" type="button" href="#" onClick={() => changeDevise(item)}>{item.symbol}</a></li>
-                                    ))}
-                                </ul>
-                            </div>
+                        <Dropdown className="me-1">
+                            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                                {deviseValue ? deviseValue.symbol : ''}
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+                                {deviseData.map((item, index) => (
+                                    <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
+                                        {item.symbol}
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown>
                         <button className="btn btn-primary" onClick={hideForm}>Retour</button>
                     </div>
                 </div>

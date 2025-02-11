@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom"
+
 function SidebarPage() {
     let userdata = JSON.parse(localStorage.getItem('user'))
     let permissions = userdata.permissions
@@ -15,13 +17,13 @@ function SidebarPage() {
             </a>
 
             <div className="sidebar-menu-wrapper overflow-y-auto scroll-sm">
-                <div className="p-20 pt-10">
+                <div className="p-20 pt-10 mb-3">
                     <ul className="sidebar-menu">
                         <li className="sidebar-menu__item">
-                            <a href="/main" className="sidebar-menu__link">
+                            <NavLink to="/main" className="sidebar-menu__link">
                                 <span className="icon"><i className="ph ph-squares-four"></i></span>
                                 <span className="text">Tableau de bord</span>
-                            </a>
+                            </NavLink>
                         </li>
                         {permissions.includes("Gérer Partenaires") ? (
                             <li className="sidebar-menu__item has-dropdown">
@@ -32,10 +34,10 @@ function SidebarPage() {
 
                                 <ul className="sidebar-submenu">
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/clients" className="sidebar-submenu__link"> Clients </a>
+                                        <NavLink to="/main/clients" className="sidebar-submenu__link"> Clients </NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/suppliers" className="sidebar-submenu__link"> Fournisseurs </a>
+                                        <NavLink to="/main/suppliers" className="sidebar-submenu__link"> Fournisseurs </NavLink>
                                     </li>
                                 </ul>
 
@@ -51,13 +53,13 @@ function SidebarPage() {
 
                                 <ul className="sidebar-submenu">
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/products" className="sidebar-submenu__link"> Produits </a>
+                                        <NavLink to="/main/products" className="sidebar-submenu__link"> Produits </NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/pourchases" className="sidebar-submenu__link"> Approvisionnements </a>
+                                        <NavLink to="/main/pourchases" className="sidebar-submenu__link"> Approvisionnements </NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/sortie-stock" className="sidebar-submenu__link"> Sortie Stock </a>
+                                        <NavLink to="/main/sortie-stock" className="sidebar-submenu__link"> Sortie Stock </NavLink>
                                     </li>
                                 </ul>
                             </li>
@@ -72,7 +74,7 @@ function SidebarPage() {
 
                                 <ul className="sidebar-submenu">
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/comand-kitchen" className="sidebar-submenu__link"> Commandes </a>
+                                        <NavLink to="/main/comand-kitchen" className="sidebar-submenu__link"> Commandes </NavLink>
                                     </li>
                                 </ul>
                             </li>
@@ -87,10 +89,10 @@ function SidebarPage() {
 
                                 <ul className="sidebar-submenu">
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/fournitures" className="sidebar-submenu__link"> Autres Fournitures</a>
+                                        <NavLink to="/main/fournitures" className="sidebar-submenu__link"> Autres Fournitures</NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/fournitures-approvisionement" className="sidebar-submenu__link">Approvisionnement</a>
+                                        <NavLink to="/main/fournitures-approvisionement" className="sidebar-submenu__link">Approvisionnement</NavLink>
                                     </li>
                                 </ul>
 
@@ -106,10 +108,10 @@ function SidebarPage() {
 
                                 <ul className="sidebar-submenu">
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/affectations-chambres" className="sidebar-submenu__link"> Affectations </a>
+                                        <NavLink to="/main/affectations-chambres" className="sidebar-submenu__link"> Affectations </NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/affectations-chambres-historique" className="sidebar-submenu__link"> Historique </a>
+                                        <NavLink to="/main/affectations-chambres-historique" className="sidebar-submenu__link"> Historique </NavLink>
                                     </li>
                                 </ul>
                             </li>
@@ -124,10 +126,10 @@ function SidebarPage() {
 
                                 <ul className="sidebar-submenu">
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/restaurant-supply" className="sidebar-submenu__link"> Approvisionnements </a>
+                                        <NavLink to="/main/restaurant-supply" className="sidebar-submenu__link"> Approvisionnements </NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/ventes" className="sidebar-submenu__link">Point de Vente </a>
+                                        <NavLink to="/main/ventes" className="sidebar-submenu__link">Point de Vente </NavLink>
                                     </li>
                                 </ul>
 
@@ -143,13 +145,13 @@ function SidebarPage() {
 
                                 <ul className="sidebar-submenu">
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/transactions-tresorerie" className="sidebar-submenu__link"> Transactions </a>
+                                        <NavLink to="/main/transactions-tresorerie" className="sidebar-submenu__link"> Transactions </NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/compte-tresorerie" className="sidebar-submenu__link"> Comptes de tresorerie</a>
+                                        <NavLink to="/main/compte-tresorerie" className="sidebar-submenu__link"> Comptes de tresorerie</NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/compte-comptables" className="sidebar-submenu__link"> Comptes comptables</a>
+                                        <NavLink to="/main/compte-comptables" className="sidebar-submenu__link"> Comptes comptables</NavLink>
                                     </li>
                                 </ul>
 
@@ -158,34 +160,34 @@ function SidebarPage() {
 
                         {permissions.includes("Gérer Rapports") ? (
                             <li className="sidebar-menu__item">
-                                <a href="/main/rapports" className="sidebar-menu__link">
+                                <NavLink to="/main/rapports" className="sidebar-menu__link">
                                     <span className="icon"><i className="ph ph-squares-four"></i></span>
                                     <span className="text">Rapports</span>
-                                </a>
+                                </NavLink>
                             </li>
                         ) : null}
 
                         {permissions.includes("Gérer Paramètres") ? (
-                            <li className="sidebar-menu__item has-dropdown">
+                            <li className="sidebar-menu__item has-dropdown mb-8">
                                 <a href="#" className="sidebar-menu__link">
                                     <span className="icon"><i className="ph ph-shield-check"></i></span>
                                     <span className="text">Parametres</span>
                                 </a>
-                                <ul className="sidebar-submenu">
+                                <ul className="sidebar-submenu pb-8">
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/roles-users" className="sidebar-submenu__link">Roles</a>
+                                        <NavLink to="/main/roles-users" className="sidebar-submenu__link">Roles</NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/users" className="sidebar-submenu__link">Utilisateurs</a>
+                                        <NavLink to="/main/users" className="sidebar-submenu__link">Utilisateurs</NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/departements" className="sidebar-submenu__link">Departements</a>
+                                        <NavLink to="/main/departements" className="sidebar-submenu__link">Departements</NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/rooms" className="sidebar-submenu__link">Chambres</a>
+                                        <NavLink to="/main/rooms" className="sidebar-submenu__link">Chambres</NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <a href="/main/devises" className="sidebar-submenu__link">Devises</a>
+                                        <NavLink to="/main/devises" className="sidebar-submenu__link pb-10">Devises</NavLink>
                                     </li>
                                 </ul>
                             </li>

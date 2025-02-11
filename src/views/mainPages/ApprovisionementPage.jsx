@@ -3,6 +3,7 @@ import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
 import ApprovisionementForm from "./components/ApprovisionementForm"
 import ApprovisionnementViewmore from "./components/ApprovisionnementViewmore"
+import { Dropdown } from 'react-bootstrap';
 
 function ApprovisionementPage() {
     const [formVisible, seteFormVisible] = useState(false)
@@ -36,7 +37,7 @@ function ApprovisionementPage() {
                 setData(res.data.data);
                 setEntries(res.data);
                 setDeviseData(res.devise)
-                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type=='devise_principale')[0])
+                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type == 'devise_principale')[0])
             }
             setLoader(false)
         } catch (error) {
@@ -62,7 +63,7 @@ function ApprovisionementPage() {
     const searchDataFn = (searchData) => {
         if (searchData) {
             let term = searchData.toLowerCase();
-            getData(1,term);
+            getData(1, term);
         } else {
             getData();
         }
@@ -81,7 +82,7 @@ function ApprovisionementPage() {
     }, [])
 
 
-    if (formVisible == false && viewmoreVisible==false) {
+    if (formVisible == false && viewmoreVisible == false) {
         return <>
             <div className="dashboard-body">
 
@@ -104,16 +105,19 @@ function ApprovisionementPage() {
                         </div>
                         <div
                             className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
-                             <div className="dropdown me-1">
-                                <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {deviseValue?deviseValue.symbol:''}
-                                </button>
-                                <ul className="dropdown-menu">
-                                    {deviseData.map((item,index)=>(
-                                        <li key={index}><a className="dropdown-item" type="button" href="#" onClick={() => changeDevise(item)}>{item.symbol}</a></li>
+                            <Dropdown className="me-1">
+                                <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                                    {deviseValue ? deviseValue.symbol : ''}
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    {deviseData.map((item, index) => (
+                                        <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
+                                            {item.symbol}
+                                        </Dropdown.Item>
                                     ))}
-                                </ul>
-                            </div>
+                                </Dropdown.Menu>
+                            </Dropdown>
                             <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Ajouter</button>
                         </div>
                     </div>
@@ -122,8 +126,8 @@ function ApprovisionementPage() {
 
 
                 <div className="card overflow-hidden">
-                    <div className="card-body p-0 overflow-x-auto">
-                        <table id="studentTable" className="table table-striped">
+                    <div className="card-body overflow-x-auto">
+                        <table id="studentTable" className="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th className="fixed-width"> #</th>
@@ -136,40 +140,40 @@ function ApprovisionementPage() {
                             </thead>
                             <tbody>
                                 {
-                                    data.length>0?(
-                                    data.map((item, index) => (
-                                        <tr key={index}>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.purchase_date}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.name}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.total_price)}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.paid_amount)}</span></td>
-                                            <td>
-                                            <button className="btn btn-main p-9 me-1" onClick={() => modelViewmore(item)}><i className="ph ph-eye text-white"></i></button>
-                                            <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ): (<tr>
+                                    data.length > 0 ? (
+                                        data.map((item, index) => (
+                                            <tr key={index}>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.purchase_date}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.name}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.total_price)}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.paid_amount)}</span></td>
+                                                <td>
+                                                    <button className="btn btn-main p-9 me-1" onClick={() => modelViewmore(item)}><i className="ph ph-eye text-white"></i></button>
+                                                    <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (<tr>
                                         <td colSpan={6}>
                                             <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
                                         </td>
                                     </tr>)
-                                    
+
                                 }
                             </tbody>
                         </table>
                     </div>
-                    <div className="paginate mt-3">
+                    <div className="paginate mt-3 mb-8">
                         <Pagination data={entries} limit={2} onPageChange={getResult} />
                     </div>
                 </div>
 
             </div>
         </>
-    } else if(formVisible == true && viewmoreVisible==false) {
+    } else if (formVisible == true && viewmoreVisible == false) {
         return <ApprovisionementForm hideForm={hideForm} />
-    }else if (formVisible == false && viewmoreVisible==true) {
+    } else if (formVisible == false && viewmoreVisible == true) {
         return <ApprovisionnementViewmore hideForm={hideForm} singleClient={singleClient} />
     }
 

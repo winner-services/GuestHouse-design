@@ -137,8 +137,8 @@ function CompteTresoreriePage() {
 
 
             <div className="card overflow-hidden">
-                <div className="card-body p-0 overflow-x-auto">
-                    <table id="studentTable" className="table table-striped">
+                <div className="card-body overflow-x-auto">
+                    <table id="studentTable" className="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th className="fixed-width"> #</th>
@@ -171,7 +171,7 @@ function CompteTresoreriePage() {
                         </tbody>
                     </table>
                 </div>
-                <div className="paginate mt-3">
+                <div className="paginate mt-3 mb-8">
                     <Pagination data={entries} limit={2} onPageChange={getResult} />
                 </div>
             </div>

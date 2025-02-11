@@ -74,7 +74,7 @@ function CloturerChambreForm({hideForm, singleRoom}) {
             setLoader(false)
         }
     }
-
+    
     useEffect(()=>{
         getRoomOptions()
     },[])

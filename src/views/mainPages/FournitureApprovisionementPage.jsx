@@ -3,6 +3,7 @@ import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
 import ApprovisionnementViewmore from "./components/ApprovisionnementViewmore"
 import FournitureApprovisionementForm from "./components/FournitureApprovisionementForm"
+import { Dropdown } from 'react-bootstrap';
 
 function FournitureApprovisionementPage() {
     const [formVisible, seteFormVisible] = useState(false)
@@ -159,16 +160,19 @@ function FournitureApprovisionementPage() {
                         </div>
                         <div
                             className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
-                            <div className="dropdown me-1">
-                                <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <Dropdown className="me-1">
+                                <Dropdown.Toggle variant="secondary" id="dropdown-basic">
                                     {deviseValue ? deviseValue.symbol : ''}
-                                </button>
-                                <ul className="dropdown-menu">
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
                                     {deviseData.map((item, index) => (
-                                        <li key={index}><a className="dropdown-item" type="button" href="#" onClick={() => changeDevise(item)}>{item.symbol}</a></li>
+                                        <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
+                                            {item.symbol}
+                                        </Dropdown.Item>
                                     ))}
-                                </ul>
-                            </div>
+                                </Dropdown.Menu>
+                            </Dropdown>
                             <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Ajouter</button>
                         </div>
                     </div>
@@ -220,8 +224,8 @@ function FournitureApprovisionementPage() {
                             <div className="card-header border-bottom">
                                 <h4 className="mb-4">Commandes en attente</h4>
                             </div>
-                            <div className="card-body p-0 overflow-x-auto">
-                                <table id="studentTable" className="table table-striped">
+                            <div className="card-body overflow-x-auto">
+                                <table id="studentTable" className="table table-bordered table-striped">
                                     <thead>
                                         <tr>
                                             <th className="fixed-width"> #</th>
@@ -262,7 +266,7 @@ function FournitureApprovisionementPage() {
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="paginate mt-3">
+                            <div className="paginate mt-3 mb-8">
                                 <Pagination data={pendingEntries} limit={2} onPageChange={getResult} />
                             </div>
                         </div>
@@ -277,8 +281,8 @@ function FournitureApprovisionementPage() {
                             </div>
                             <div className="card-body">
                                 <div className="card overflow-hidden">
-                                    <div className="card-body p-0 overflow-x-auto">
-                                        <table id="studentTable" className="table table-striped">
+                                    <div className="card-body overflow-x-auto">
+                                        <table id="studentTable" className="table table-bordered table-striped">
                                             <thead>
                                             <tr>
                                                 <th className="fixed-width"> #</th>
@@ -305,8 +309,8 @@ function FournitureApprovisionementPage() {
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.unit_price * item.quantity)}</span></td>
                                                                 <td>
-                                                                    {item.treasure_status==0?<span class="plan-badge py-4 px-16 bg-info-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">En attente</span>:''}
-                                                                    {item.treasure_status==1?<span class="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Validées</span>:''}
+                                                                    {item.treasure_status==0?<span className="plan-badge py-4 px-16 bg-info-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">En attente</span>:''}
+                                                                    {item.treasure_status==1?<span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Validées</span>:''}
                                                                 </td>
                                                                 <td>
                                                                     <button className="btn btn-main p-9 me-1" onClick={() => modalValidateCommande({id:item.id, status:"Validated"})}><i className="ph ph-check text-white"></i></button>
@@ -323,7 +327,7 @@ function FournitureApprovisionementPage() {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div className="paginate mt-3">
+                                    <div className="paginate mt-3 mb-8">
                                         <Pagination data={validatedEntries} limit={2} onPageChange={getResult} />
                                     </div>
                                 </div>
@@ -341,8 +345,8 @@ function FournitureApprovisionementPage() {
                             </div>
                             <div className="card-body">
                                 <div className="card overflow-hidden">
-                                    <div className="card-body p-0 overflow-x-auto">
-                                        <table id="studentTable" className="table table-striped">
+                                    <div className="card-body overflow-x-auto">
+                                        <table id="studentTable" className="table table-bordered table-striped">
                                         <thead>
                                         <tr>
                                             <th className="fixed-width"> #</th>
@@ -383,7 +387,7 @@ function FournitureApprovisionementPage() {
                                     </tbody>
                                         </table>
                                     </div>
-                                    <div className="paginate mt-3">
+                                    <div className="paginate mt-3 mb-8">
                                         <Pagination data={reejectedEntries} limit={2} onPageChange={getResult} />
                                     </div>
                                 </div>

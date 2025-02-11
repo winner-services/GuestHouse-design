@@ -2,16 +2,19 @@ import { useContext, useEffect, useState } from "react"
 import ClientForm from "./components/ClientForm"
 import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
+import ClientViewmore from "./components/ClientViewmore"
 
 function ClientPage() {
-    const [formVisible, seteFormVisible] = useState(false)
+    const [formVisible, setFormVisible] = useState(false)
+    const [viewmoreVisible, setViewmoreVisible] = useState(false)
     const [singleClient, setSingleClient] = useState({})
     const [data, setData] = useState([])
     const [entries, setEntries] = useState([])
     const { setLoader } = useContext(MainContext);
 
     const hideForm = () => {
-        seteFormVisible(false)
+        setFormVisible(false)
+        setViewmoreVisible(false)
         getData();
         Object.keys(singleClient).forEach(function (key, index) {
             delete singleClient[key];
@@ -26,7 +29,7 @@ function ClientPage() {
                 headers: headerRequest
             });
             const res = await response.json();
-            console.log("DATAs:", res.data)
+            console.log("CLIENT DATA:", res.data)
             if (res.data) {
                 setData(res.data.data);
                 setEntries(res.data);
@@ -40,13 +43,18 @@ function ClientPage() {
 
     const modelUpdate = (model) => {
         setSingleClient(model)
-        seteFormVisible(true)
+        setFormVisible(true)
+    }
+
+    const modelViewMore = (model) => {
+        setSingleClient(model)
+        setViewmoreVisible(true)
     }
 
     const searchDataFn = (searchData) => {
         if (searchData) {
             let term = searchData.toLowerCase();
-            getData(1,term);
+            getData(1, term);
         } else {
             getData();
         }
@@ -65,7 +73,7 @@ function ClientPage() {
     }, [])
 
 
-    if (formVisible == false) {
+    if (formVisible == false && viewmoreVisible == false) {
         return <>
             <div className="dashboard-body">
 
@@ -88,7 +96,7 @@ function ClientPage() {
                         </div>
                         <div
                             className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
-                            <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Ajouter</button>
+                            <button className="btn btn-primary" onClick={() => setFormVisible(true)}>Ajouter</button>
                         </div>
                     </div>
                     {/* Breadcrumb Right End */}
@@ -96,8 +104,8 @@ function ClientPage() {
 
 
                 <div className="card overflow-hidden">
-                    <div className="card-body p-0 overflow-x-auto">
-                        <table id="studentTable" className="table table-striped">
+                    <div className="card-body overflow-x-auto">
+                        <table id="studentTable" className="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th className="fixed-width"> #</th>
@@ -111,40 +119,43 @@ function ClientPage() {
                             </thead>
                             <tbody>
                                 {
-                                    data.length>0?(
-                                    data.map((item, index) => (
-                                        <tr key={index}>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.name}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.gender == "M" ? 'Masculin' : 'Feminin'}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.address}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.phone}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.email}</span></td>
-                                            <td>
-                                            <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
-                                            <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ): (<tr>
+                                    data.length > 0 ? (
+                                        data.map((item, index) => (
+                                            <tr key={index}>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.name}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.gender == "Masculin" ? 'Masculin' : 'Feminin'}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.address}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.phone}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.email}</span></td>
+                                                <td>
+                                                    <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
+                                                    <button className="btn btn-info p-9 me-1" onClick={() => modelViewMore(item)}><i className="ph ph-file-text text-white"></i></button>
+                                                    <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (<tr>
                                         <td colSpan={7}>
                                             <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
                                         </td>
                                     </tr>)
-                                    
+
                                 }
                             </tbody>
                         </table>
                     </div>
-                    <div className="paginate mt-3">
+                    <div className="pagination mt-3 mb-8">
                         <Pagination data={entries} limit={2} onPageChange={getResult} />
                     </div>
                 </div>
 
             </div>
         </>
-    } else {
+    } else if (formVisible == true && viewmoreVisible == false) {
         return <ClientForm hideForm={hideForm} singleClient={singleClient} />
+    } else if (formVisible == false && viewmoreVisible == true) {
+        return <ClientViewmore hideForm={hideForm} singleClient={singleClient} />
     }
 
 }

@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
 import ProductForm from "./components/ProductForm"
+import { Dropdown } from 'react-bootstrap';
 
 function ProductPage() {
     const [formVisible, seteFormVisible] = useState(false)
@@ -33,7 +34,7 @@ function ProductPage() {
                 setData(res.data.data);
                 setEntries(res.data);
                 setDeviseData(res.devise)
-                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type=='devise_principale')[0])
+                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type == 'devise_principale')[0])
             }
             setLoader(false)
         } catch (error) {
@@ -101,16 +102,19 @@ function ProductPage() {
                         </div>
                         <div
                             className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
-                            <div className="dropdown me-1">
-                                <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {deviseValue?deviseValue.symbol:''}
-                                </button>
-                                <ul className="dropdown-menu">
-                                    {deviseData.map((item,index)=>(
-                                        <li key={index}><a className="dropdown-item" type="button" href="#" onClick={() => changeDevise(item)}>{item.symbol}</a></li>
+                            <Dropdown className="me-1">
+                                <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                                    {deviseValue ? deviseValue.symbol : ''}
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    {deviseData.map((item, index) => (
+                                        <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
+                                            {item.symbol}
+                                        </Dropdown.Item>
                                     ))}
-                                </ul>
-                            </div>
+                                </Dropdown.Menu>
+                            </Dropdown>
                             <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Ajouter</button>
                         </div>
                     </div>
@@ -119,8 +123,8 @@ function ProductPage() {
 
 
                 <div className="card overflow-hidden">
-                    <div className="card-body p-0 overflow-x-auto">
-                        <table id="studentTable" className="table table-striped">
+                    <div className="card-body overflow-x-auto">
+                        <table id="studentTable" className="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th className="fixed-width"> #</th>
@@ -163,7 +167,7 @@ function ProductPage() {
                             </tbody>
                         </table>
                     </div>
-                    <div className="pagination mt-3">
+                    <div className="pagination mt-3 mb-8">
                         <Pagination data={entries} limit={2} onPageChange={getResult} />
                     </div>
 

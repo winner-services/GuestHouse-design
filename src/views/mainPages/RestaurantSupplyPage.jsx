@@ -200,8 +200,8 @@ function RestaurantSupplyPage() {
                             </div>
                             <div className="card-body">
                                 <div className="card overflow-hidden">
-                                    <div className="card-body p-0 overflow-x-auto">
-                                        <table id="studentTable" className="table table-striped">
+                                    <div className="card-body overflow-x-auto">
+                                        <table id="studentTable" className="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
                                                     <th className="fixed-width"> #</th>
@@ -223,9 +223,9 @@ function RestaurantSupplyPage() {
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity} {item.unit}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.agent}</span></td>
                                                                 <td>
-                                                                    {item.status=='Pending'?<span class="plan-badge py-4 px-16 bg-main-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">En attente</span>:''}
-                                                                    {item.status=='Validated'?<span class="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Validées</span>:''}
-                                                                    {item.status=='Rejected'?<span class="plan-badge py-4 px-16 bg-danger-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Rejetées</span>:''}
+                                                                    {item.status=='Pending'?<span className="plan-badge py-4 px-16 bg-main-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">En attente</span>:''}
+                                                                    {item.status=='Validated'?<span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Validées</span>:''}
+                                                                    {item.status=='Rejected'?<span className="plan-badge py-4 px-16 bg-danger-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Rejetées</span>:''}
                                                                 </td>
                                                             </tr>
                                                         ))
@@ -238,7 +238,7 @@ function RestaurantSupplyPage() {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div className="paginate mt-3">
+                                    <div className="paginate mt-3 mb-8">
                                         <Pagination data={allEntries} limit={2} onPageChange={getResult} />
                                     </div>
                                 </div>
@@ -256,8 +256,8 @@ function RestaurantSupplyPage() {
                             </div>
                             <div className="card-body">
                                 <div className="card overflow-hidden">
-                                    <div className="card-body p-0 overflow-x-auto">
-                                        <table id="studentTable" className="table table-striped">
+                                    <div className="card-body overflow-x-auto">
+                                        <table id="studentTable" className="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
                                                     <th className="fixed-width"> #</th>
@@ -293,7 +293,7 @@ function RestaurantSupplyPage() {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div className="paginate mt-3">
+                                    <div className="paginate mt-3 mb-8">
                                         <Pagination data={pendingEntries} limit={2} onPageChange={getResult} />
                                     </div>
                                 </div>
@@ -311,8 +311,8 @@ function RestaurantSupplyPage() {
                             </div>
                             <div className="card-body">
                                 <div className="card overflow-hidden">
-                                    <div className="card-body p-0 overflow-x-auto">
-                                        <table id="studentTable" className="table table-striped">
+                                    <div className="card-body overflow-x-auto">
+                                        <table id="studentTable" className="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
                                                     <th className="fixed-width">#</th>
@@ -343,7 +343,7 @@ function RestaurantSupplyPage() {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div className="paginate mt-3">
+                                    <div className="paginate mt-3 mb-8">
                                         <Pagination data={validatedEntries} limit={2} onPageChange={getResult} />
                                     </div>
                                 </div>
@@ -361,8 +361,8 @@ function RestaurantSupplyPage() {
                             </div>
                             <div className="card-body">
                                 <div className="card overflow-hidden">
-                                    <div className="card-body p-0 overflow-x-auto">
-                                        <table id="studentTable" className="table table-striped">
+                                    <div className="card-body overflow-x-auto">
+                                        <table id="studentTable" className="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
                                                     <th className="fixed-width">#</th>
@@ -393,7 +393,7 @@ function RestaurantSupplyPage() {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div className="paginate mt-3">
+                                    <div className="paginate mt-3 mb-8">
                                         <Pagination data={reejectedEntries} limit={2} onPageChange={getResult} />
                                     </div>
                                 </div>

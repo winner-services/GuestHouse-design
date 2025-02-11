@@ -47,7 +47,7 @@ function ApprovisionementForm({ hideForm }) {
         let generalForm = {}
 
         generalForm.achat = base_form;
-        generalForm.achat.total_price = brut_total_price;
+        generalForm.achat.total_price = Object.values(pourchase_form).reduce((acc, item) => acc + (item["unite_price"] * item["quantity"]), 0);
         generalForm.achat_detail = pourchase_form;
 
         setLoader(true)

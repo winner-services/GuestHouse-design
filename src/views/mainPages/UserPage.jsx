@@ -133,8 +133,8 @@ function UserPage() {
 
 
                 <div className="card overflow-hidden">
-                    <div className="card-body p-0 overflow-x-auto">
-                        <table id="studentTable" className="table table-striped">
+                    <div className="card-body overflow-x-auto">
+                        <table id="studentTable" className="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th className="fixed-width"> #</th>
@@ -157,8 +157,8 @@ function UserPage() {
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.phone}</span></td>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.email}</span></td>
                                             <td>
-                                                {item.active==0?<span class="plan-badge py-4 px-16 bg-info-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Suspendu</span>:''}
-                                                {item.active==1?<span class="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Activé</span>:''}
+                                                {item.active==0?<span className="plan-badge py-4 px-16 bg-info-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Suspendu</span>:''}
+                                                {item.active==1?<span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Activé</span>:''}
                                             </td>
                                             <td>
                                                 <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
@@ -177,7 +177,7 @@ function UserPage() {
                             </tbody>
                         </table>
                     </div>
-                    <div className="paginate mt-3">
+                    <div className="paginate mt-3 mb-8">
                         <Pagination data={entries} limit={2} onPageChange={getResult} />
                     </div>
                 </div>

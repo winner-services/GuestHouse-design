@@ -2,16 +2,19 @@ import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
 import SupplierForm from "./components/SupplierForm"
+import FournisseurViewmore from "./components/FournisseurViewmore"
 
 function SupplierPage() {
     const [formVisible, seteFormVisible] = useState(false)
     const [singleSupplier, setsingleSupplier] = useState({})
+    const [viewmoreVisible, setViewmoreVisible] = useState(false)
     const [data, setData] = useState([])
     const [entries, setEntries] = useState([])
     const { setLoader } = useContext(MainContext);
 
     const hideForm = () => {
         seteFormVisible(false)
+        setViewmoreVisible(false)
         getData();
         Object.keys(singleSupplier).forEach(function (key, index) {
             delete singleSupplier[key];
@@ -43,6 +46,11 @@ function SupplierPage() {
         seteFormVisible(true)
     }
 
+    const modelViewMore = (model) => {
+        setsingleSupplier(model)
+        setViewmoreVisible(true)
+    }
+
     const searchDataFn = (searchData) => {
         if (searchData) {
             let term = searchData.toLowerCase();
@@ -65,7 +73,7 @@ function SupplierPage() {
     }, [])
 
 
-    if (formVisible == false) {
+    if (formVisible == false && viewmoreVisible == false) {
         return <>
             <div className="dashboard-body">
 
@@ -96,8 +104,8 @@ function SupplierPage() {
 
 
                 <div className="card overflow-hidden">
-                    <div className="card-body p-0 overflow-x-auto">
-                        <table id="studentTable" className="table table-striped">
+                    <div className="card-body overflow-x-auto">
+                        <table id="studentTable" className="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th className="fixed-width"> #</th>
@@ -116,12 +124,13 @@ function SupplierPage() {
                                             <tr key={index}>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.name}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.gender == "M" ? 'Masculin' : 'Feminin'}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.gender == "Masculin" ? 'Masculin' : 'Feminin'}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.address}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.phone}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.email}</span></td>
                                                 <td>
                                                     <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
+                                                    <button className="btn btn-info p-9 me-1" onClick={() => modelViewMore(item)}><i className="ph ph-file-text text-white"></i></button>
                                                     <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
                                                 </td>
                                             </tr>
@@ -136,15 +145,17 @@ function SupplierPage() {
                             </tbody>
                         </table>
                     </div>
-                    <div className="paginate mt-3">
+                    <div className="paginate mt-3 mb-8">
                         <Pagination data={entries} limit={2} onPageChange={getResult} />
                     </div>
                 </div>
 
             </div>
         </>
-    } else {
+    } else if(formVisible == true && viewmoreVisible == false){
         return <SupplierForm hideForm={hideForm} singleSupplier={singleSupplier} />
+    } else if (formVisible == false && viewmoreVisible == true) {
+        return <FournisseurViewmore hideForm={hideForm} singleSupplier={singleSupplier} />
     }
 
 }

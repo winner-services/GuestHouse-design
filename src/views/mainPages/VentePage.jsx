@@ -4,6 +4,7 @@ import Pagination from "../../pagination/Pagination"
 import Modal from 'react-bootstrap/Modal';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { Dropdown } from 'react-bootstrap';
 
 function VentePage() {
     const [formVisible, seteFormVisible] = useState(false)
@@ -103,7 +104,7 @@ function VentePage() {
                 setData(res.data);
                 setEntries(res);
                 setDeviseData(res.devise)
-                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type=='devise_principale')[0])
+                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type == 'devise_principale')[0])
             }
             setLoader(false)
         } catch (error) {
@@ -335,7 +336,7 @@ function VentePage() {
                         RCCM: 22-A-01622<br>
                         Impôt : A2315632S<br>
                         +243999023794<br>
-                        johnsservices@gmail.com<br>
+                        johnservices@gmail.com<br>
                         <h2>FACTURE No: ${reference}</h2>
                     </div>
 
@@ -357,7 +358,7 @@ function VentePage() {
                         </thead>
                         <tbody>
                         ${pourchase_form.map((item, index) => (
-                             `<tr>
+                `<tr>
                                 <td>${index + 1}</td>
                                 <td>${item.product_name}</td>
                                 <td>${item.quantity} ${item.unite}</td>
@@ -419,16 +420,19 @@ function VentePage() {
                     </div>
                     <div
                         className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
-                            <div className="dropdown me-1">
-                                <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {deviseValue?deviseValue.symbol:''}
-                                </button>
-                                <ul className="dropdown-menu">
-                                    {deviseData.map((item,index)=>(
-                                        <li key={index}><a className="dropdown-item" type="button" href="#" onClick={() => changeDevise(item)}>{item.symbol}</a></li>
-                                    ))}
-                                </ul>
-                            </div>
+                        <Dropdown className="me-1">
+                            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                                {deviseValue ? deviseValue.symbol : ''}
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+                                {deviseData.map((item, index) => (
+                                    <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
+                                        {item.symbol}
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown>
                         <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Ajouter</button>
                     </div>
                 </div>
@@ -437,8 +441,8 @@ function VentePage() {
 
 
             <div className="card overflow-hidden">
-                <div className="card-body p-0 overflow-x-auto">
-                    <table id="studentTable" className="table table-striped">
+                <div className="card-body overflow-x-auto">
+                    <table id="studentTable" className="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th className="fixed-width"> #</th>
@@ -461,8 +465,8 @@ function VentePage() {
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.total_price)}</span></td>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.paid_amount)}</span></td>
                                             <td>
-                                                {item.status == 0 ? <span class="plan-badge py-4 px-16 bg-main-600 text-white text-bold inset-inline-end-0 inset-block-start-0 mt-8 text-10">En attente</span> : ''}
-                                                {item.status == 1 ? <span class="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-10">Validées</span> : ''}
+                                                {item.status == 0 ? <span className="plan-badge py-4 px-16 bg-main-600 text-white text-bold inset-inline-end-0 inset-block-start-0 mt-8 text-10">En attente</span> : ''}
+                                                {item.status == 1 ? <span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-10">Validées</span> : ''}
                                             </td>
                                             <td>
                                                 <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
@@ -481,7 +485,7 @@ function VentePage() {
                         </tbody>
                     </table>
                 </div>
-                <div className="paginate mt-3">
+                <div className="paginate mt-3 mb-8">
                     <Pagination data={entries} limit={2} onPageChange={getResult} />
                 </div>
             </div>
