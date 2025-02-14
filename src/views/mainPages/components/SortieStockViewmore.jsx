@@ -68,8 +68,8 @@ function SortieStockViewmore({ hideForm, singleClient }) {
                         <div className="card-body">
                             <h4 className="d-flex justify-content-center">DETAIL DU  SORTIE EN STOCK</h4>
                             <div className="card overflow-hidden">
-                                <div className="card-body p-0 overflow-x-auto">
-                                    <table id="studentTable" className="table table-striped">
+                                <div className="card-body overflow-x-auto">
+                                    <table id="studentTable" className="table table-bordered table-striped">
                                         <thead>
                                             <tr>
                                                 <th className="fixed-width"> #</th>
@@ -84,7 +84,7 @@ function SortieStockViewmore({ hideForm, singleClient }) {
                                                         <tr key={index}>
                                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.product}</span></td>
-                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.output_quantity}</span></td>
+                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.output_quantity} {item.unite}</span></td>
                                                         </tr>
                                                     ))
                                                 ) : (<tr>

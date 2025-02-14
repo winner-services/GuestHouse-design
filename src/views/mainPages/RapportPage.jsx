@@ -41,6 +41,14 @@ function RapportPage() {
                                     <td>5</td>
                                     <td><a href="#">Etat de stock</a></td>
                                 </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td><a href="#">Dettes Clients</a></td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td><a href="#">Dettes Fournisseurs</a></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

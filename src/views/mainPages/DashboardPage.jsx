@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import CanvasJSReact from '@canvasjs/react-charts';
 import { MainContext } from "../../config/MainContext";
 import Pagination from "../../pagination/Pagination"
+import { Dropdown } from 'react-bootstrap';
 
 function DashboardPage() {
     var CanvasJS = CanvasJSReact.CanvasJS;
@@ -12,6 +13,17 @@ function DashboardPage() {
     const [saleStatistic, setSaleStatistic] = useState([])
     const [productAlert, setProductAlert] = useState([])
     const [productAlertEntries, setProductAlertEntries] = useState([])
+    const [deviseData, setDeviseData] = useState([])
+    const [deviseValue, setDeviseValue] = useState({})
+    var now = new Date();
+    var month = (now.getMonth() + 1);
+    var day = now.getDate();
+    if (month < 10)
+        month = "0" + month;
+    if (day < 10)
+        day = "0" + day;
+    var today = now.getFullYear() + '-' + month + '-' + day;
+
     const [mainData, setMainData] = useState({
         recette_chambre: 0,
         recette_produit: 0,
@@ -19,8 +31,8 @@ function DashboardPage() {
         total_vente: 0
     })
     const [form, setForm] = useState({
-        date_start: "",
-        date_end: "",
+        first_date: now.getFullYear() + '-' + month + '-01',
+        end_date: today,
     })
 
     const options_sold_product = {
@@ -78,16 +90,18 @@ function DashboardPage() {
         }]
     }
 
-    const getData = async (page = 1) => {
+    const getData = async (page = 1, form_data=form) => {
         try {
             setLoader(true)
             const response = await fetch(`${BaseUrl}/getDashBoardData?page=${page}`, {
                 method: 'POST',
-                headers: headerRequest
+                headers: headerRequest,
+                body: JSON.stringify(form_data),
             });
             const res = await response.json();
             if (res) {
-                console.log(res)
+                setDeviseData(res.devise)
+                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type == 'devise_principale')[0])
                 setTopRooms(res.top5Rooms)
                 setTopProducts(res.Top5Products)
                 setSaleStatistic(res.salesStatistics)
@@ -108,6 +122,33 @@ function DashboardPage() {
         }
     }
 
+    const changeDevise = (model) => {
+        setDeviseValue(model)
+    }
+
+    const get_net_value = (value) => {
+        let result = Number(value) * Number(deviseValue.conversion_amount)
+        return `${result} ${deviseValue.symbol}`
+    }
+
+    const change_first_date = (start_date) => {
+        setForm({...form, first_date: start_date})
+        let form_current = {
+            first_date: start_date,
+            end_date: form.end_date
+        }
+        getData(1, form_current)
+    }
+
+    const change_end_date = (end_date) => {
+        setForm({...form, end_date: end_date})
+        let form_current = {
+            first_date: form.first_date,
+            end_date: end_date
+        }
+        getData(1, form_current)
+    }
+
     const getResult = (pages) => {
 
         if (!pages) {
@@ -125,6 +166,43 @@ function DashboardPage() {
 
         <div className="dashboard-body">
 
+            <div className="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+                {/* Breadcrumb Start */}
+                <div className="breadcrumb mb-24">
+                    <ul className="flex-align gap-4">
+                        <li> <span className="text-gray-500 fw-normal d-flex"><i className="ph ph-caret-right"></i></span> </li>
+                        <li><span className="text-main-600 fw-normal text-15">Tableau de bord</span></li>
+                    </ul>
+                </div>
+                {/* Breadcrumb End */}
+
+                {/* Breadcrumb Right Start */}
+                <div className="flex-align gap-8 flex-wrap">
+                    <div className="position-relative text-gray-500 flex-align gap-4 text-13">
+                        <input type="date" className="form-control" value={form.first_date} onChange={(e) => { change_first_date(e.target.value) }} />
+                        <i className="ph ph-arrow-right"></i>
+                        <input type="date" className="form-control" value={form.end_date} onChange={(e) => { change_end_date(e.target.value) }} />
+                    </div>
+                    <div
+                        className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
+                        <Dropdown className="me-1">
+                            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                                {deviseValue ? deviseValue.symbol : ''}
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+                                {deviseData.map((item, index) => (
+                                    <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
+                                        {item.symbol}
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    </div>
+                </div>
+                {/* Breadcrumb Right End */}
+            </div>
+
             <div className="row gy-4">
                 <div className="col-lg-12">
                     {/* Widgets Start */}
@@ -132,12 +210,12 @@ function DashboardPage() {
                         <div className="col-xxl-3 col-sm-6">
                             <div className="card">
                                 <div className="card-body">
-                                    <h4 className="mb-2">{mainData.recette_produit}</h4>
+                                    <h4 className="mb-2">{get_net_value(mainData.recette_produit)}</h4>
                                     <span className="text-gray-600">Recette Vente</span>
                                     <div className="flex-between gap-8 mt-16">
                                         <span
                                             className="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-main-two-600 text-white text-2xl"><i
-                                                className="ph-fill ph-certificate"></i></span>
+                                                className="ph-fill ph-shopping-cart"></i></span>
                                         <div id="earned-certificate" className="remove-tooltip-title rounded-tooltip-value">
                                         </div>
                                     </div>
@@ -147,12 +225,12 @@ function DashboardPage() {
                         <div className="col-xxl-3 col-sm-6">
                             <div className="card">
                                 <div className="card-body">
-                                    <h4 className="mb-2">{mainData.recette_chambre}</h4>
+                                    <h4 className="mb-2">{get_net_value(mainData.recette_chambre)}</h4>
                                     <span className="text-gray-600">Recette Chambre</span>
                                     <div className="flex-between gap-8 mt-16">
                                         <span
                                             className="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-main-two-600 text-white text-2xl"><i
-                                                className="ph-fill ph-certificate"></i></span>
+                                                className="ph-fill ph-bed"></i></span>
                                         <div id="earned-certificate" className="remove-tooltip-title rounded-tooltip-value">
                                         </div>
                                     </div>
@@ -162,12 +240,12 @@ function DashboardPage() {
                         <div className="col-xxl-3 col-sm-6">
                             <div className="card">
                                 <div className="card-body">
-                                    <h4 className="mb-2">{mainData.total_vente}</h4>
-                                    <span className="text-gray-600">Total Recettes</span>
+                                    <h4 className="mb-2">{get_net_value(mainData.total_vente)}</h4>
+                                    <span className="text-gray-600">Total Dette Clients</span>
                                     <div className="flex-between gap-8 mt-16">
                                         <span
                                             className="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-purple-600 text-white text-2xl">
-                                            <i className="ph-fill ph-graduation-cap"></i></span>
+                                            <i className="ph-fill ph-users-three"></i></span>
                                         <div id="course-progress" className="remove-tooltip-title rounded-tooltip-value">
                                         </div>
                                     </div>
@@ -177,12 +255,12 @@ function DashboardPage() {
                         <div className="col-xxl-3 col-sm-6">
                             <div className="card">
                                 <div className="card-body">
-                                    <h4 className="mb-2">{mainData.total_depense}</h4>
+                                    <h4 className="mb-2">{get_net_value(mainData.total_depense)}</h4>
                                     <span className="text-gray-600">Total Depenses</span>
                                     <div className="flex-between gap-8 mt-16">
                                         <span
                                             className="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-warning-600 text-white text-2xl"><i
-                                                className="ph-fill ph-users-three"></i></span>
+                                                className="ph-fill ph-money"></i></span>
                                         <div id="community-support" className="remove-tooltip-title rounded-tooltip-value">
                                         </div>
                                     </div>

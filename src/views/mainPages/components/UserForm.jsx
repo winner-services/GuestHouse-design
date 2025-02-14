@@ -165,11 +165,11 @@ function UserForm({ hideForm, singleClient }) {
                                             <option value="Féminin">Féminin</option>
                                         </select>
                                     </div>
-                                    <div className="col-sm-6 col-xs-6">
+                                    {/* <div className="col-sm-6 col-xs-6">
                                         <label for="address" className="form-label mb-8 h6">Addresse</label>
                                         <input type="text" className="form-control py-11" id="address" value={form.address} onChange={(e) => { setForm({ ...form, address: e.target.value }) }}
                                             placeholder="Entrer une addresse" />
-                                    </div>
+                                    </div> */}
                                     <div className="col-sm-6 col-xs-6">
                                         <label for="telephone" className="form-label mb-8 h6">Telephone</label>
                                         <PhoneInput

@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
 import ChambreForm from "./components/ChambreForm"
+import { Dropdown } from 'react-bootstrap';
 
 function ChambresPage() {
     const [formVisible, seteFormVisible] = useState(false)
@@ -9,6 +10,8 @@ function ChambresPage() {
     const [data, setData] = useState([])
     const [entries, setEntries] = useState([])
     const { setLoader } = useContext(MainContext);
+    const [deviseData, setDeviseData] = useState([]);
+    const [deviseValue, setDeviseValue] = useState({});
 
     const hideForm = () => {
         seteFormVisible(false)
@@ -30,6 +33,8 @@ function ChambresPage() {
             if (res.data) {
                 setData(res.data.data);
                 setEntries(res.data);
+                setDeviseData(res.devise)
+                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type == 'devise_principale')[0])
             }
             setLoader(false)
         } catch (error) {
@@ -46,7 +51,7 @@ function ChambresPage() {
     const searchDataFn = (searchData) => {
         if (searchData) {
             let term = searchData.toLowerCase();
-            getData(1,term);
+            getData(1, term);
         } else {
             getData();
         }
@@ -58,6 +63,15 @@ function ChambresPage() {
             pages = 1;
         }
         getData(pages);
+    }
+
+    const changeDevise = (model) => {
+        setDeviseValue(model)
+    }
+
+    const get_net_value = (value) => {
+        let result = Number(value) * Number(deviseValue.conversion_amount)
+        return `${result} ${deviseValue.symbol}`
     }
 
     useEffect(() => {
@@ -88,6 +102,19 @@ function ChambresPage() {
                         </div>
                         <div
                             className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
+                            <Dropdown className="me-1">
+                                <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                                    {deviseValue ? deviseValue.symbol : ''}
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    {deviseData.map((item, index) => (
+                                        <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
+                                            {item.symbol}
+                                        </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
                             <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Ajouter</button>
                         </div>
                     </div>
@@ -111,27 +138,27 @@ function ChambresPage() {
                             </thead>
                             <tbody>
                                 {
-                                    data.length>0?(
-                                    data.map((item, index) => (
-                                        <tr key={index}>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.designation}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.niveau}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.categorie}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.unite_price}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.status}</span></td>
-                                            <td>
-                                                <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
-                                                <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ): (<tr>
+                                    data.length > 0 ? (
+                                        data.map((item, index) => (
+                                            <tr key={index}>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.designation}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.niveau}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.categorie}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.unite_price)}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.status}</span></td>
+                                                <td>
+                                                    <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
+                                                    <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (<tr>
                                         <td colSpan={7}>
                                             <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
                                         </td>
                                     </tr>)
-                                    
+
                                 }
                             </tbody>
                         </table>

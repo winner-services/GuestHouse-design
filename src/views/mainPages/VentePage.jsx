@@ -5,6 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { Dropdown } from 'react-bootstrap';
+import VenteViewmore from "./components/VenteViewmore";
 
 function VentePage() {
     const [formVisible, seteFormVisible] = useState(false)
@@ -18,6 +19,8 @@ function VentePage() {
     const [pourchase_form, setpourchase_form] = useState([]);
     const [deviseData, setDeviseData] = useState([]);
     const [deviseValue, setDeviseValue] = useState({});
+    const [viewmoreVisible, setViewmoreVisible] = useState(false)
+    const [singleClient, setSingleClient] = useState({})
 
     var now = new Date();
     var month = (now.getMonth() + 1);
@@ -38,16 +41,18 @@ function VentePage() {
 
     const hideForm = () => {
         seteFormVisible(false)
-        getData();
+        setViewmoreVisible(false)
         Object.keys(singleVente).forEach(function (key, index) {
             delete singleVente[key];
         });
-        Object.keys(pourchase_form).forEach(function (key, index) {
-            delete pourchase_form[key];
+        setpourchase_form([])
+        setBaseForm({...base_form, paid_amount:0, customer_id:"",total_price:0, sale_date:today, account_id:1, status:""})
+        setViewmoreVisible(false)
+        Object.keys(singleClient).forEach(function (key, index) {
+            delete singleClient[key];
         });
-        Object.keys(base_form).forEach(function (key, index) {
-            base_form[key] = ""
-        });
+        getData();
+        getProductOptions()
     }
 
     const submitData = async (status) => {
@@ -71,13 +76,11 @@ function VentePage() {
                 body: JSON.stringify(generalForm),
             });
             const res = await response.json();
-            if (res.success) {
+            if (res.status) {
+                handleDownloadPDF(res.reference)
                 toastr.success("Une vente a ete insere avec success", "Success");
-                if (handleDownloadPDF(res.reference)) {
-                    hideForm(false)
-                }
+                hideForm(false)
                 setLoader(false)
-
             } else {
                 toastr.error("Veillez reessayez", "Erreur");
                 console.log(res)
@@ -175,7 +178,7 @@ function VentePage() {
                 headers: headerRequest
             });
             const res = await response.json();
-            console.log("DATAs:", res.data)
+            console.log("DATAs PRODUCT:", res.data)
             if (res.data) {
                 Object.keys(productData).forEach(function (key, index) {
                     delete productData[key];
@@ -221,19 +224,13 @@ function VentePage() {
                 "unite_price": model.unite_price,
                 "unite": model.unite,
                 "quantity": 1,
-                "total_price": 0
+                "total_price": model.unite_price * 1
             }
 
             setpourchase_form((prevPourchaseForm) => [...prevPourchaseForm, { ...transit_form, index: pourchase_form.length }]);
-            // setBaseForm((prevBaseForm) => ({
-            //     ...prevBaseForm, 
-            //     paid_amount: Object.values(pourchase_form).reduce((acc, item) => acc + item.total_price, 0) 
-            // }));
+            // setBaseForm({...base_form, paid_amount: Object.values(pourchase_form).reduce((acc, item) => acc + item.total_price, 0)})
             console.log("FORM:", pourchase_form)
             // Calculate total brut_total_price
-            const sum = Object.values(pourchase_form).reduce((acc, item) => acc + item.total_price, 0);
-            console.log("BRUTAL TOTAL PRICE: ", sum)
-            base_form.paid_amount = sum;
         }
     };
 
@@ -243,10 +240,6 @@ function VentePage() {
             delete updatedPourchaseForm[model.index];
             return updatedPourchaseForm.filter(item => item !== undefined);
         });
-        // setBaseForm((prevBaseForm) => ({
-        //     ...prevBaseForm, 
-        //     paid_amount: Object.values(pourchase_form).reduce((acc, item) => acc + item.total_price, 0) 
-        // }));
     };
 
     const getResult = (pages) => {
@@ -390,6 +383,11 @@ function VentePage() {
         };
     };
 
+    const modelViewmore = (model) => {
+        setSingleClient(model)
+        setViewmoreVisible(true)
+    }
+
     useEffect(() => {
         getData()
         getClientOptions()
@@ -397,256 +395,263 @@ function VentePage() {
         getProductCategoryOptions()
     }, [])
 
-    return <>
-        <div className="dashboard-body">
+    if (viewmoreVisible == false) {
+        return <>
+            <div className="dashboard-body">
 
-            <div className="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
-                {/* Breadcrumb Start */}
-                <div className="breadcrumb mb-24">
-                    <ul className="flex-align gap-4">
-                        <li><a href="/main" className="text-gray-200 fw-normal text-15 hover-text-main-600">Accueil</a>
-                        </li>
-                        <li> <span className="text-gray-500 fw-normal d-flex"><i className="ph ph-caret-right"></i></span> </li>
-                        <li><span className="text-main-600 fw-normal text-15">Liste des ventes</span></li>
-                    </ul>
-                </div>
-
-                {/* Breadcrumb End */}
-
-                {/* Breadcrumb Right Start */}
-                <div className="flex-align gap-8 flex-wrap">
-                    <div className="position-relative text-gray-500 flex-align gap-4 text-13">
-                        <input type="text" className="form-control" placeholder="Chercher..." onChange={(e) => { searchDataFn(e.target.value) }} />
+                <div className="breadcrumb-with-buttons mb-24 flex-between flex-wrap gap-8">
+                    {/* Breadcrumb Start */}
+                    <div className="breadcrumb mb-24">
+                        <ul className="flex-align gap-4">
+                            <li><a href="/main" className="text-gray-200 fw-normal text-15 hover-text-main-600">Accueil</a>
+                            </li>
+                            <li> <span className="text-gray-500 fw-normal d-flex"><i className="ph ph-caret-right"></i></span> </li>
+                            <li><span className="text-main-600 fw-normal text-15">Liste des ventes</span></li>
+                        </ul>
                     </div>
-                    <div
-                        className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
-                        <Dropdown className="me-1">
-                            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-                                {deviseValue ? deviseValue.symbol : ''}
-                            </Dropdown.Toggle>
 
-                            <Dropdown.Menu>
-                                {deviseData.map((item, index) => (
-                                    <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
-                                        {item.symbol}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                        <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Ajouter</button>
-                    </div>
-                </div>
-                {/* Breadcrumb Right End */}
-            </div>
+                    {/* Breadcrumb End */}
 
-
-            <div className="card overflow-hidden">
-                <div className="card-body overflow-x-auto">
-                    <table id="studentTable" className="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th className="fixed-width"> #</th>
-                                <th className="h6 text-gray-300">Date</th>
-                                <th className="h6 text-gray-300">Clients</th>
-                                <th className="h6 text-gray-300">Prix Total</th>
-                                <th className="h6 text-gray-300">Montant payé</th>
-                                <th className="h6 text-gray-300">Etat</th>
-                                <th className="h6 text-gray-300">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                data.length > 0 ? (
-                                    data.map((item, index) => (
-                                        <tr key={index}>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.sale_date}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.customer}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.total_price)}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.paid_amount)}</span></td>
-                                            <td>
-                                                {item.status == 0 ? <span className="plan-badge py-4 px-16 bg-main-600 text-white text-bold inset-inline-end-0 inset-block-start-0 mt-8 text-10">En attente</span> : ''}
-                                                {item.status == 1 ? <span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-10">Validées</span> : ''}
-                                            </td>
-                                            <td>
-                                                <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
-                                                <button className="btn btn-success p-9 me-1" onClick={() => modelDette(item)}><i className="ph ph-eye text-white"></i></button>
-                                                <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (<tr>
-                                    <td colSpan={6}>
-                                        <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
-                                    </td>
-                                </tr>)
-
-                            }
-                        </tbody>
-                    </table>
-                </div>
-                <div className="paginate mt-3 mb-8">
-                    <Pagination data={entries} limit={2} onPageChange={getResult} />
-                </div>
-            </div>
-
-        </div>
-        <Modal show={formVisible} onHide={hideForm} fullscreen={true} centered backdrop="static">
-            <Modal.Header closeButton>
-                <Modal.Title>Nouvelle Vente</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <div className="row">
-                    <div className="col-md-4">
-                        <div className="col-sm-12 col-xs-12 mb-8">
-                            <label htmlFor="fname" className="form-label mb-8 h6">Date de transaction</label>
-                            <input type="date" className="form-control py-11" id="fname" value={base_form.sale_date} onChange={(e) => { setBaseForm({ ...base_form, sale_date: e.target.value }) }}
-                                placeholder="Entrer une date" />
+                    {/* Breadcrumb Right Start */}
+                    <div className="flex-align gap-8 flex-wrap">
+                        <div className="position-relative text-gray-500 flex-align gap-4 text-13">
+                            <input type="text" className="form-control" placeholder="Chercher..." onChange={(e) => { searchDataFn(e.target.value) }} />
                         </div>
-                        <div className="row">
-                            <div className="col-sm-6 col-xs-6 mb-8">
-                                <label htmlFor="email" className="form-label mb-8 h6">Client</label>
-                                <select id="" value={base_form.customer_id} onChange={(e) => { setBaseForm({ ...base_form, customer_id: e.target.value }) }} className="form-control py-11">
-                                    <option hidden>Selectionnez un client</option>
-                                    {clientData.map((item, index) => (
-                                        <option value={item.id} key={index}>{item.name}</option>
+                        <div
+                            className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
+                            <Dropdown className="me-1">
+                                <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                                    {deviseValue ? deviseValue.symbol : ''}
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    {deviseData.map((item, index) => (
+                                        <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
+                                            {item.symbol}
+                                        </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Ajouter</button>
+                        </div>
+                    </div>
+                    {/* Breadcrumb Right End */}
+                </div>
+
+
+                <div className="card overflow-hidden">
+                    <div className="card-body overflow-x-auto">
+                        <table id="studentTable" className="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th className="fixed-width"> #</th>
+                                    <th className="h6 text-gray-300">Date</th>
+                                    <th className="h6 text-gray-300">Clients</th>
+                                    <th className="h6 text-gray-300">Prix Total</th>
+                                    <th className="h6 text-gray-300">Montant payé</th>
+                                    <th className="h6 text-gray-300">Etat</th>
+                                    <th className="h6 text-gray-300">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    data.length > 0 ? (
+                                        data.map((item, index) => (
+                                            <tr key={index}>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.sale_date}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.customer}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.total_price)}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.paid_amount)}</span></td>
+                                                <td>
+                                                    {item.status == 0 ? <span className="plan-badge py-4 px-16 bg-main-600 text-white text-bold inset-inline-end-0 inset-block-start-0 mt-8 text-10">En attente</span> : ''}
+                                                    {item.status == 1 ? <span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-10">Validées</span> : ''}
+                                                </td>
+                                                <td>
+                                                    <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
+                                                    <button className="btn btn-success p-9 me-1" onClick={() => modelViewmore(item)}><i className="ph ph-eye text-white"></i></button>
+                                                    <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (<tr>
+                                        <td colSpan={6}>
+                                            <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
+                                        </td>
+                                    </tr>)
+
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="paginate mt-3 mb-8">
+                        <Pagination data={entries} limit={2} onPageChange={getResult} />
+                    </div>
+                </div>
+
+            </div>
+            <Modal show={formVisible} onHide={hideForm} fullscreen={true} centered backdrop="static">
+                <Modal.Header closeButton>
+                    <Modal.Title>Nouvelle Vente</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="row">
+                        <div className="col-md-4">
+                            <div className="col-sm-12 col-xs-12 mb-8">
+                                <label htmlFor="fname" className="form-label mb-8 h6">Date de transaction</label>
+                                <input type="date" className="form-control py-11" id="fname" value={base_form.sale_date} onChange={(e) => { setBaseForm({ ...base_form, sale_date: e.target.value }) }}
+                                    placeholder="Entrer une date" />
+                            </div>
+                            <div className="row">
+                                <div className="col-sm-6 col-xs-6 mb-8">
+                                    <label htmlFor="email" className="form-label mb-8 h6">Client</label>
+                                    <select id="" value={base_form.customer_id} onChange={(e) => { setBaseForm({ ...base_form, customer_id: e.target.value }) }} className="form-control py-11">
+                                        <option hidden>Selectionnez un client</option>
+                                        {clientData.map((item, index) => (
+                                            <option value={item.id} key={index}>{item.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="col-sm-6 col-xs-6 mb-8">
+                                    <label htmlFor="fname" className="form-label mb-8 h6">Montant Payé</label>
+                                    <input type="number" className="form-control py-11" id="fname" value={base_form.paid_amount} onChange={(e) => { setBaseForm({ ...base_form, paid_amount: e.target.value }) }}
+                                        placeholder="Entrer un montant" />
+                                </div>
+                            </div>
+
+                            <div className="col-sm-12 col-xs-12 mb-8">
+                                <label htmlFor="email" className="form-label mb-8 h6">Produits</label>
+                                <select id="" className="form-control py-11" onChange={(e) => addLignBtn(e.target.value)}>
+                                    <option hidden>Selectionnez un produit</option>
+                                    {productData.map((item, index) => (
+                                        <option value={item.product_id} key={index}>{item.product}</option>
                                     ))}
                                 </select>
                             </div>
-                            <div className="col-sm-6 col-xs-6 mb-8">
-                                <label htmlFor="fname" className="form-label mb-8 h6">Montant Payé</label>
-                                <input type="number" className="form-control py-11" id="fname" value={base_form.paid_amount} onChange={(e) => { setBaseForm({ ...base_form, paid_amount: e.target.value }) }}
-                                    placeholder="Entrer un montant" />
+
+                            <div className="col-sm-12 col-xs-12 mb-8">
+                                <div className="table-responsive">
+                                    <table className="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Produit</th>
+                                                <th>Qté</th>
+                                                <th>P.U</th>
+                                                <th>P.T</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {
+                                                pourchase_form.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
+                                                        <td><span className="h6 mb-0 fw-medium text-gray-300">{item.product_name}</span></td>
+                                                        <td><span className="h6 mb-0 fw-medium text-gray-300"><input type="number"
+                                                            min={1}
+                                                            value={item.quantity}
+                                                            onChange={(newValue) => {
+                                                                const updatedItems = [...pourchase_form];
+                                                                updatedItems[index] = { ...updatedItems[index], quantity: newValue.target.value >= 1 ? newValue.target.value : 1, total_price: ((newValue.target.value) * (item.unite_price >= 1 ? item.unite_price : 1)) };
+                                                                setBaseForm({...base_form, paid_amount: updatedItems[index].unite_price * newValue.target.value})
+                                                                setpourchase_form(updatedItems);
+                                                            }} style={{ borderWidth: 0, width: 40 }} /> {item.unite}</span></td>
+                                                        <td><span className="h6 mb-0 fw-medium text-gray-300"><input type="number"
+                                                            min={1}
+                                                            value={item.unite_price}
+                                                            onChange={(newValue) => {
+                                                                const updatedItems = [...pourchase_form];
+                                                                updatedItems[index] = { ...updatedItems[index], unite_price: newValue.target.value >= 1 ? newValue.target.value : 1, total_price: ((newValue.target.value) * (item.quantity >= 1 ? item.quantity : 1)) };
+                                                                setBaseForm({...base_form, paid_amount: updatedItems[index].quantity * newValue.target.value})
+                                                                setpourchase_form(updatedItems);
+                                                            }} style={{ borderWidth: 0, width: 40 }} /></span></td>
+                                                        <td><span className="h6 mb-0 fw-medium text-gray-300">{item.total_price}</span></td>
+                                                        <td>
+                                                            <button type="button" className="btn btn-danger p-9" onClick={() => removeLignBtn(item)}>
+                                                                <i className="ph ph-trash text-white"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            }
+                                            <tr>
+                                                <td colSpan={4}>
+                                                    <b className="d-flex justify-content-center">TOTAL</b>
+                                                </td>
+                                                <td><b>{Object.values(pourchase_form).reduce((acc, item) => acc + item.total_price, 0)}</b></td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="col-sm-12 col-xs-12 mb-8">
-                            <label htmlFor="email" className="form-label mb-8 h6">Produits</label>
-                            <select id="" className="form-control py-11" onChange={(e) => addLignBtn(e.target.value)}>
-                                <option hidden>Selectionnez un produit</option>
-                                {productData.map((item, index) => (
-                                    <option value={item.product_id} key={index}>{item.product}</option>
-                                ))}
-                            </select>
                         </div>
-
-                        <div className="col-sm-12 col-xs-12 mb-8">
-                            <div className="table-responsive">
-                                <table className="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Produit</th>
-                                            <th>Qté</th>
-                                            <th>P.U</th>
-                                            <th>P.T</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            pourchase_form.map((item, index) => (
-                                                <tr key={index}>
-                                                    <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
-                                                    <td><span className="h6 mb-0 fw-medium text-gray-300">{item.product_name}</span></td>
-                                                    <td><span className="h6 mb-0 fw-medium text-gray-300"><input type="number"
-                                                        min={1}
-                                                        value={item.quantity}
-                                                        onChange={(newValue) => {
-                                                            const updatedItems = [...pourchase_form];
-                                                            updatedItems[index] = { ...updatedItems[index], quantity: newValue.target.value >= 1 ? newValue.target.value : 1, total_price: ((newValue.target.value) * (item.unite_price)) };
-                                                            setpourchase_form(updatedItems);
-                                                        }} style={{ borderWidth: 0, width: 40 }} /> {item.unite}</span></td>
-                                                    <td><span className="h6 mb-0 fw-medium text-gray-300"><input type="number"
-                                                        min={1}
-                                                        value={item.unite_price}
-                                                        onChange={(newValue) => {
-                                                            const updatedItems = [...pourchase_form];
-                                                            updatedItems[index] = { ...updatedItems[index], unite_price: newValue.target.value >= 1 ? newValue.target.value : 1, total_price: ((newValue.target.value) * (item.quantity)) };
-                                                            setpourchase_form(updatedItems);
-                                                        }} style={{ borderWidth: 0, width: 40 }} /></span></td>
-                                                    <td><span className="h6 mb-0 fw-medium text-gray-300">{item.total_price}</span></td>
-                                                    <td>
-                                                        <button type="button" className="btn btn-danger p-9" onClick={() => removeLignBtn(item)}>
-                                                            <i className="ph ph-trash text-white"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        }
-                                        <tr>
-                                            <td colSpan={4}>
-                                                <b className="d-flex justify-content-center">TOTAL</b>
-                                            </td>
-                                            <td><b>{Object.values(pourchase_form).reduce((acc, item) => acc + item.total_price, 0)}</b></td>
-                                            <td></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div className="col-md-8">
-                        <div style={{ overflowX: 'auto', display: 'flex', whiteSpace: 'nowrap', borderBottom: "1px solid #c2c8c6", paddingBottom: 15 }}>
-                            {
-                                productCategoryData.map((item, index) => (
-                                    // <div className="m-2" key={index} style={{ border: "1px solid #c2c8c6", borderRadius: 10, display: 'flex', justifyItems: 'center', background: '#c2c8c6', width: '10%', height: 80, cursor:'pointer' }} onClick={()=> getProductOptions(item.id)}>
-                                    //     <p className="text-center" style={{ wordWrap: 'break-word' }}>{item.designation}</p>
-                                    // </div>
-                                    <div className="plan-item rounded-16 border border-gray-100 transition-2 position-relative me-1" key={index} onClick={() => getProductOptions(item.id)} style={{ cursor: 'pointer' }}>
-                                        <h6 className="mb-4">{item.designation}</h6>
-                                    </div>
-                                ))
-                            }
-                        </div>
-
-                        <div className="row g-20" style={{ overflow: 'auto', height: 500 }}>
-                            {productData.map((item, index) => (
-                                <div key={index} className="col-xl-3 col-md-4 col-sm-6 pt-12" style={{ cursor: 'pointer' }} onClick={() => addLignBtn(item.product_id)}>
-                                    <div className="mentor-card rounded-8 overflow-hidden">
-                                        <div className="mentor-card__cover position-relative" style={{ height: 100 }}>
-                                            <img src={item.image ? `${ImageUrl}/${item.image}` : `/assets/images/default-product.png`} alt="" className="cover-img" style={{ height: '100%' }} />
+                        <div className="col-md-8">
+                            <div style={{ overflowX: 'auto', display: 'flex', whiteSpace: 'nowrap', borderBottom: "1px solid #c2c8c6", paddingBottom: 15 }}>
+                                {
+                                    productCategoryData.map((item, index) => (
+                                        // <div className="m-2" key={index} style={{ border: "1px solid #c2c8c6", borderRadius: 10, display: 'flex', justifyItems: 'center', background: '#c2c8c6', width: '10%', height: 80, cursor:'pointer' }} onClick={()=> getProductOptions(item.id)}>
+                                        //     <p className="text-center" style={{ wordWrap: 'break-word' }}>{item.designation}</p>
+                                        // </div>
+                                        <div className="plan-item rounded-16 border border-gray-100 transition-2 position-relative me-1" key={index} onClick={() => getProductOptions(item.id)} style={{ cursor: 'pointer' }}>
+                                            <h6 className="mb-4">{item.designation}</h6>
                                         </div>
-                                        <div className="mentor-card__content text-center" >
-                                            <div style={{ paddingTop: 50 }}>
-                                                <h5 className="text-gray-500">{item.product}</h5>
+                                    ))
+                                }
+                            </div>
 
-                                                <div className="mentor-card__rating mt-20 border border-gray-100 px-8 py-6 rounded-8 flex-between flex-wrap">
-                                                    <div className="flex-align gap-4">
-                                                        <span className="text-13 fw-normal text-gray-600">Prix :</span>
-                                                    </div>
-                                                    <div className="flex-align gap-4">
-                                                        <span className="text-13 fw-normal text-gray-600">{get_net_value(item.unite_price)}</span>
-                                                    </div>
-                                                    <div className="vr"></div>
-                                                    <div className="flex-align gap-4">
-                                                        <span className="text-13 fw-normal text-gray-600">Qte :</span>
-                                                    </div>
-                                                    <div className="flex-align gap-4">
-                                                        <span className="text-13 fw-normal text-gray-600">{item.stock_quantity} {item.unite}</span>
+                            <div className="row g-20" style={{ overflow: 'auto', height: 500 }}>
+                                {productData.map((item, index) => (
+                                    <div key={index} className="col-xl-3 col-md-4 col-sm-6 pt-12" style={{ cursor: 'pointer' }} onClick={() => addLignBtn(item.product_id)}>
+                                        <div className="mentor-card rounded-8 overflow-hidden">
+                                            <div className="mentor-card__cover position-relative" style={{ height: 100 }}>
+                                                <img src={item.image ? `${ImageUrl}/${item.image}` : `/assets/images/default-product.png`} alt="" className="cover-img" style={{ height: '100%' }} />
+                                            </div>
+                                            <div className="mentor-card__content text-center" >
+                                                <div style={{ paddingTop: 50 }}>
+                                                    <h5 className="text-gray-500">{item.product}</h5>
+
+                                                    <div className="mentor-card__rating mt-20 border border-gray-100 px-8 py-6 rounded-8 flex-between flex-wrap">
+                                                        <div className="flex-align gap-4">
+                                                            <span className="text-13 fw-normal text-gray-600">Prix :</span>
+                                                        </div>
+                                                        <div className="flex-align gap-4">
+                                                            <span className="text-13 fw-normal text-gray-600">{get_net_value(item.unite_price)}</span>
+                                                        </div>
+                                                        <div className="vr"></div>
+                                                        <div className="flex-align gap-4">
+                                                            <span className="text-13 fw-normal text-gray-600">Qte :</span>
+                                                        </div>
+                                                        <div className="flex-align gap-4">
+                                                            <span className="text-13 fw-normal text-gray-600">{item.stock_quantity} {item.unite}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
+
+
                                             </div>
-
-
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
 
+                            </div>
                         </div>
-                    </div>
 
-                </div>
-            </Modal.Body>
-            <Modal.Footer style={{ justifyContent: 'flex-start' }}>
-                <button className="btn btn-outline-danger bg-danger-100 border-danger-100 text-danger-600 rounded-pill py-9" onClick={hideForm}>Annuler</button>
-                <button type="button" className="btn btn-main rounded-pill py-9" onClick={() => submitData(0)}>Enregistrer</button>
-                <button type="button" className="btn btn-success rounded-pill py-9" onClick={() => submitData(1)}>Cloturer</button>
-            </Modal.Footer>
-        </Modal>
-    </>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer style={{ justifyContent: 'flex-start' }}>
+                    <button className="btn btn-outline-danger bg-danger-100 border-danger-100 text-danger-600 rounded-pill py-9" onClick={hideForm}>Annuler</button>
+                    <button type="button" className="btn btn-main rounded-pill py-9" onClick={() => submitData(0)}>Enregistrer</button>
+                    <button type="button" className="btn btn-success rounded-pill py-9" onClick={() => submitData(1)}>Cloturer</button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    } else {
+        return <VenteViewmore hideForm={hideForm} singleClient={singleClient} />
+    }
+
 
 }
 

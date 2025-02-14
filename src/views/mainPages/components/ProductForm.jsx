@@ -14,7 +14,8 @@ function ProductForm({ hideForm, singleProduct }) {
         image: ""
     })
     const [unitForm, setUnitForm] = useState({
-        designation: ""
+        designation: "",
+        description:""
     })
 
     const { setLoader } = useContext(MainContext);
@@ -67,6 +68,7 @@ function ProductForm({ hideForm, singleProduct }) {
         setModalVisible(false)
         setUnitFormVisible(false)
         unitForm.designation = ""
+        unitForm.description = ""
     }
 
     const showUnitModal = () => {
@@ -304,9 +306,14 @@ function ProductForm({ hideForm, singleProduct }) {
             </Modal.Header>
             <Modal.Body>
                 <div className="col-sm-12 col-xs-12">
-                    <label for="address" className="form-label mb-8 h6">Designation</label>
+                    <label for="address" className="form-label mb-8 h6">{unitFormVisible?"Abréviation":"Designation"}</label>
                     <input type="text" className="form-control py-11" id="address" value={unitForm.designation} onChange={(e) => { setUnitForm({ ...unitForm, designation: e.target.value }) }}
-                        placeholder="Entrer une designation" />
+                        placeholder={unitFormVisible?"Ajouter une abréviation":"Ajouter une designation"} />
+                </div>
+                <div className="col-sm-12 col-xs-12">
+                    <label for="address" className="form-label mb-8 h6">{unitFormVisible?"Designation":"Description"}</label>
+                    <input type="text" className="form-control py-11" id="address" value={unitForm.description} onChange={(e) => { setUnitForm({ ...unitForm, description: e.target.value }) }}
+                        placeholder={unitFormVisible?"Entrer une Designation":"Entrer une Description"} />
                 </div>
             </Modal.Body>
             <Modal.Footer>

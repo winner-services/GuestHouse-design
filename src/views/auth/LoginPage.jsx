@@ -34,13 +34,14 @@ function LoginPage() {
                 // navigate('/main');
                 location.href = "/main"
             } else {
-                toastr.error("Votre email ou votre mot de passe est incorrect", "Erreur!")
+                console.log(response.data.message)
+                toastr.error(response.data.message, "Erreur!")
             }
 
             setLoader(false)
         } catch (error) {
             console.error(error); // Handle login errors gracefully
-            toastr.error("Votre email ou votre mot de passe est incorrect", "Erreur!")
+            toastr.error("Erreur du serveur", "Erreur!")
             setLoader(false)
         }
     };
@@ -56,9 +57,11 @@ function LoginPage() {
             </div>
             <div className="auth-right py-40 px-24 flex-center flex-column">
                 <div className="auth-right__inner mx-auto w-100">
-                    <a href="#" className="auth-right__logo d-flex justify-content-center">
-                        <img src="assets/images/logo.jpeg" alt="" style={{ height: 100 }} />
+                    <a href="#" className="auth-right__logo" style={{textAlign:'center'}}>
+                        <img src="favicon-icon.jpeg" alt="" style={{ height: 100 }} />
+                        <h3 className="text-success">JOHN SERVICE MOTEL</h3>
                     </a>
+                    
                     <h2 className="mb-8">Bienvenu!</h2>
                     <p className="text-gray-600 text-15 mb-32">Connectez-vous pour ouvrir votre session</p>
 

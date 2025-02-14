@@ -124,7 +124,7 @@ function ClientPage() {
                                             <tr key={index}>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.name}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.gender == "Masculin" ? 'Masculin' : 'Feminin'}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.gender == "Masculin" ? 'Masculin' : 'Féminin'}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.address}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.phone}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.email}</span></td>

@@ -28,7 +28,7 @@ function SidebarPage() {
                         {permissions.includes("Gérer Partenaires") ? (
                             <li className="sidebar-menu__item has-dropdown">
                                 <a href="#" className="sidebar-menu__link">
-                                    <span className="icon"><i className="ph ph-graduation-cap"></i></span>
+                                    <span className="icon"><i className="ph ph-users"></i></span>
                                     <span className="text">Partenaires</span>
                                 </a>
 
@@ -47,7 +47,7 @@ function SidebarPage() {
                         {permissions.includes("Gérer Magasin") ? (
                             <li className="sidebar-menu__item has-dropdown">
                                 <a href="#" className="sidebar-menu__link">
-                                    <span className="icon"><i className="ph ph-graduation-cap"></i></span>
+                                    <span className="icon"><i className="ph ph-bag"></i></span>
                                     <span className="text">Magasin</span>
                                 </a>
 
@@ -59,7 +59,7 @@ function SidebarPage() {
                                         <NavLink to="/main/pourchases" className="sidebar-submenu__link"> Approvisionnements </NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <NavLink to="/main/sortie-stock" className="sidebar-submenu__link"> Sortie Stock </NavLink>
+                                        <NavLink to="/main/sortie-stock" className="sidebar-submenu__link"> Tranfert Stock </NavLink>
                                     </li>
                                 </ul>
                             </li>
@@ -68,7 +68,7 @@ function SidebarPage() {
                         {permissions.includes("Gérer Cuisine") ? (
                             <li className="sidebar-menu__item has-dropdown">
                                 <a href="#" className="sidebar-menu__link">
-                                    <span className="icon"><i className="ph ph-graduation-cap"></i></span>
+                                    <span className="icon"><i className="ph ph-house"></i></span>
                                     <span className="text">Cuisine</span>
                                 </a>
 
@@ -83,7 +83,7 @@ function SidebarPage() {
                         {permissions.includes("Gérer Fournitures") ? (
                             <li className="sidebar-menu__item has-dropdown">
                                 <a href="#" className="sidebar-menu__link">
-                                    <span className="icon"><i className="ph ph-graduation-cap"></i></span>
+                                    <span className="icon"><i className="ph ph-table"></i></span>
                                     <span className="text">Fournitures</span>
                                 </a>
 
@@ -102,7 +102,7 @@ function SidebarPage() {
                         {permissions.includes("Gérer Hôtellerie") ? (
                             <li className="sidebar-menu__item has-dropdown">
                                 <a href="#" className="sidebar-menu__link">
-                                    <span className="icon"><i className="ph ph-graduation-cap"></i></span>
+                                    <span className="icon"><i className="ph ph-bed"></i></span>
                                     <span className="text">Hôtellerie</span>
                                 </a>
 
@@ -120,7 +120,7 @@ function SidebarPage() {
                         {permissions.includes("Gérer BarResto") ? (
                             <li className="sidebar-menu__item has-dropdown">
                                 <a href="#" className="sidebar-menu__link">
-                                    <span className="icon"><i className="ph ph-graduation-cap"></i></span>
+                                    <span className="icon"><i className="ph ph-coffee"></i></span>
                                     <span className="text">Restaurant</span>
                                 </a>
 
@@ -139,7 +139,7 @@ function SidebarPage() {
                         {permissions.includes("Gérer Comptabilité") ? (
                             <li className="sidebar-menu__item has-dropdown">
                                 <a href="#" className="sidebar-menu__link">
-                                    <span className="icon"><i className="ph ph-graduation-cap"></i></span>
+                                    <span className="icon"><i className="ph ph-money"></i></span>
                                     <span className="text">Comptabilité</span>
                                 </a>
 
@@ -170,7 +170,7 @@ function SidebarPage() {
                         {permissions.includes("Gérer Paramètres") ? (
                             <li className="sidebar-menu__item has-dropdown mb-8">
                                 <a href="#" className="sidebar-menu__link">
-                                    <span className="icon"><i className="ph ph-shield-check"></i></span>
+                                    <span className="icon"><i className="ph ph-gear"></i></span>
                                     <span className="text">Parametres</span>
                                 </a>
                                 <ul className="sidebar-submenu pb-8">

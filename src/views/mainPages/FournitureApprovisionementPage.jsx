@@ -187,7 +187,7 @@ function FournitureApprovisionementPage() {
                                     <li className="nav-item" role="presentation">
                                         <button className="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
                                             data-bs-target="#pills-profile" type="button" role="tab"
-                                            aria-controls="pills-profile" aria-selected="false">Commandes validées</button>
+                                            aria-controls="pills-profile" aria-selected="false">Commandes Validée</button>
                                     </li>
                                 </ul>
                             </div>
@@ -202,7 +202,7 @@ function FournitureApprovisionementPage() {
                                     <li className="nav-item" role="presentation">
                                         <button className="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
                                             data-bs-target="#pills-profile" type="button" role="tab"
-                                            aria-controls="pills-profile" aria-selected="false">Commandes validées</button>
+                                            aria-controls="pills-profile" aria-selected="false">Commandes Validée</button>
                                     </li>
                                     <li className="nav-item" role="presentation">
                                         <button className="nav-link" id="pills-rejected-tab" data-bs-toggle="pill"
@@ -277,7 +277,7 @@ function FournitureApprovisionementPage() {
                         tabindex="0">
                         <div className="card mt-24">
                             <div className="card-header border-bottom">
-                                <h4 className="mb-4">Commandes validées </h4>
+                                <h4 className="mb-4">Commande Validée </h4>
                             </div>
                             <div className="card-body">
                                 <div className="card overflow-hidden">
@@ -310,7 +310,7 @@ function FournitureApprovisionementPage() {
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.unit_price * item.quantity)}</span></td>
                                                                 <td>
                                                                     {item.treasure_status==0?<span className="plan-badge py-4 px-16 bg-info-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">En attente</span>:''}
-                                                                    {item.treasure_status==1?<span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Validées</span>:''}
+                                                                    {item.treasure_status==1?<span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Validée</span>:''}
                                                                 </td>
                                                                 <td>
                                                                     <button className="btn btn-main p-9 me-1" onClick={() => modalValidateCommande({id:item.id, status:"Validated"})}><i className="ph ph-check text-white"></i></button>

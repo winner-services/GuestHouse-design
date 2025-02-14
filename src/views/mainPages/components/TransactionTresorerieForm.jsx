@@ -2,12 +2,21 @@ import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../../config/MainContext";
 
 function TransactionTresorerieForm({ hideForm, singleClient }) {
+    var now = new Date();
+    var month = (now.getMonth() + 1);
+    var day = now.getDate();
+    if (month < 10)
+        month = "0" + month;
+    if (day < 10)
+        day = "0" + day;
+    var today = now.getFullYear() + '-' + month + '-' + day;
     const [form, setForm] = useState({
-        transaction_date: "",
+        transaction_date: today,
         amount: 1,
-        phone: "",
-        address: "",
-        email: ""
+        motif: "",
+        account_id: "",
+        category_id: "",
+        transaction_type:"",
     })
 
     const { setLoader } = useContext(MainContext);
@@ -17,20 +26,16 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
     const submitData = async (e) => {
         e.preventDefault()
 
-        let url = `createClient`
+        let url = `createTransactionTreasury`
         let method = 'POST'
         if (form.id) {
-            url = `updateClient/${singleClient.id}`
+            url = `updateTransactionTreasury/${singleClient.id}`
             method = 'PUT'
             // insertUpdateFn(url, method, form)
         }
 
         setLoader(true)
         try {
-            if (form.phone.charAt(0) != '+') {
-                form.phone = [form.phone.slice(0, 0), "+", form.phone.slice(0)].join('');
-            }
-
             const response = await fetch(`${BaseUrl}/${url}`, {
                 method: method,
                 headers: headerRequest,
@@ -38,7 +43,7 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
             });
             const res = await response.json();
             if (res.success) {
-                toastr.success("Un client a ete insere avec success", "Success");
+                toastr.success("Une transaction a ete insere avec success", "Success");
                 hideForm(false)
                 Object.keys(form).forEach(function (key, index) {
                     delete form[key];
@@ -159,13 +164,13 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
                                             placeholder="Entrer un montant" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="email" className="form-label mb-8 h6">Motif</label>
-                                        <input type="text" className="form-control py-11" id="email" value={form.email} onChange={(e) => { setForm({ ...form, email: e.target.value }) }}
+                                        <label for="motif" className="form-label mb-8 h6">Motif</label>
+                                        <input type="text" className="form-control py-11" id="motif" value={form.motif} onChange={(e) => { setForm({ ...form, motif: e.target.value }) }}
                                             placeholder="Entrer un motif" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
                                         <label for="lname" className="form-label mb-8 h6 me-1">Compte de tresorerie</label>
-                                        <select className="form-control py-11" value={form.unit_id} onChange={(e) => { setForm({ ...form, unit_id: e.target.value }) }}>
+                                        <select className="form-control py-11" value={form.account_id} onChange={(e) => { setForm({ ...form, account_id: e.target.value }) }}>
                                             <option hidden>Selectionner une option</option>
                                             {comptetData.map((item, index) => (
                                                 <option value={item.id} key={index}>{item.designation}</option>
@@ -174,7 +179,7 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
                                         <label for="lname" className="form-label mb-8 h6 me-1">Compte comptables</label>
-                                        <select className="form-control py-11" value={form.unit_id} onChange={(e) => { setForm({ ...form, unit_id: e.target.value }) }}>
+                                        <select className="form-control py-11" value={form.category_id} onChange={(e) => { setForm({ ...form, category_id: e.target.value }) }}>
                                             <option hidden>Selectionner une option</option>
                                             {compteAccountData.map((item, index) => (
                                                 <option value={item.id} key={index}>{item.designation}</option>
@@ -183,10 +188,10 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
                                         <label for="lname" className="form-label mb-8 h6 me-1">Type de transaction</label>
-                                        <select className="form-control py-11" value={form.unit_id} onChange={(e) => { setForm({ ...form, unit_id: e.target.value }) }}>
+                                        <select className="form-control py-11" value={form.transaction_type} onChange={(e) => { setForm({ ...form, transaction_type: e.target.value }) }}>
                                             <option hidden>Selectionner une option</option>
-                                            <option value="Recette">Recette</option>
-                                            <option value="Depense">Depense</option>
+                                            <option value="RECETTE">Recette</option>
+                                            <option value="DEPENSE">Depense</option>
                                             
                                         </select>
                                     </div>

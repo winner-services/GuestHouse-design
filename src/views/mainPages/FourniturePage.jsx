@@ -2,16 +2,19 @@ import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
 import Modal from 'react-bootstrap/Modal';
+import { Dropdown } from 'react-bootstrap';
 
 function FourniturePage() {
     const [formVisible, seteFormVisible] = useState(false)
     const [data, setData] = useState([])
     const [entries, setEntries] = useState([])
     const { setLoader } = useContext(MainContext);
+    const [deviseData, setDeviseData] = useState([]);
+    const [deviseValue, setDeviseValue] = useState({});
     const [form, setForm] = useState({
-        designation:"",
-        quantity:0,
-        value:0
+        designation: "",
+        quantity: 0,
+        value: 0
     })
 
     const hideForm = () => {
@@ -34,6 +37,8 @@ function FourniturePage() {
             if (res.data) {
                 setData(res.data.data);
                 setEntries(res.data);
+                setDeviseData(res.devise)
+                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type == 'devise_principale')[0])
             }
             setLoader(false)
         } catch (error) {
@@ -43,7 +48,8 @@ function FourniturePage() {
     }
 
     const modelUpdate = (model) => {
-        setForm({...form,
+        setForm({
+            ...form,
             designation: model.designation,
             quantity: model.quantity,
             value: model.value,
@@ -109,6 +115,15 @@ function FourniturePage() {
         }
     }
 
+    const changeDevise = (model) => {
+        setDeviseValue(model)
+    }
+
+    const get_net_value = (value) => {
+        let result = Number(value) * Number(deviseValue.conversion_amount)
+        return `${result} ${deviseValue.symbol}`
+    }
+
     useEffect(() => {
         getData()
     }, [])
@@ -135,6 +150,19 @@ function FourniturePage() {
                     </div>
                     <div
                         className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
+                        <Dropdown className="me-1">
+                            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                                {deviseValue ? deviseValue.symbol : ''}
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+                                {deviseData.map((item, index) => (
+                                    <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
+                                        {item.symbol}
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown>
                         <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Ajouter</button>
                     </div>
                 </div>
@@ -162,7 +190,7 @@ function FourniturePage() {
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.designation}</span></td>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity}</span></td>
-                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.value}</span></td>
+                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.value)}</span></td>
                                             <td>
                                                 <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
                                                 <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>

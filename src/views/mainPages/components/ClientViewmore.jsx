@@ -140,7 +140,10 @@ function ClientViewmore({ hideForm, singleClient }) {
                             </Dropdown.Menu>
                         </Dropdown>
                         <button className="btn btn-secondary me-1" onClick={hideForm}>Retour</button>
-                        <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Paiement</button>
+                        {data.length > 0 ?(
+                            <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Paiement</button>
+                        ):null}
+                        
                     </div>
                 </div>
                 {/* Breadcrumb Right End */}

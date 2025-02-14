@@ -132,6 +132,7 @@ function ApprovisionementPage() {
                                 <tr>
                                     <th className="fixed-width"> #</th>
                                     <th className="h6 text-gray-300">Date</th>
+                                    <th className="h6 text-gray-300">Reference</th>
                                     <th className="h6 text-gray-300">Fournisseurs</th>
                                     <th className="h6 text-gray-300">Prix Total</th>
                                     <th className="h6 text-gray-300">Montant payé</th>
@@ -145,6 +146,7 @@ function ApprovisionementPage() {
                                             <tr key={index}>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.purchase_date}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.reference}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.name}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.total_price)}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.paid_amount)}</span></td>

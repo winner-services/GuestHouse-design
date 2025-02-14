@@ -146,7 +146,7 @@ function ProductPage() {
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300" style={{ width: 70 }}><img src={item.image ? `${ImageUrl}/${item.image}` : `/assets/images/default-product.png`} alt="" style={{ width: '100%' }} /></span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.designation}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.minimum_quantity}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.minimum_quantity} {item.unite}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity} {item.unite}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.purchase_price)}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.selling_price)}</span></td>

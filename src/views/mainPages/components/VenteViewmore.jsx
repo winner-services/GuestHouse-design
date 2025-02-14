@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../../config/MainContext";
 import { Dropdown } from 'react-bootstrap';
 
-function ApprovisionnementViewmore({ hideForm, singleClient }) {
+function VenteViewmore({ hideForm, singleClient }) {
     const [data, setData] = useState([])
     const { setLoader } = useContext(MainContext);
     const [deviseData, setDeviseData] = useState([]);
@@ -11,7 +11,7 @@ function ApprovisionnementViewmore({ hideForm, singleClient }) {
     const getData = async () => {
         try {
             setLoader(true)
-            const response = await fetch(`${BaseUrl}/getDetailSupply/${singleClient.id}`, {
+            const response = await fetch(`${BaseUrl}/getDetailSale/${singleClient.sale_id}`, {
                 method: 'GET',
                 headers: headerRequest
             });
@@ -39,6 +39,7 @@ function ApprovisionnementViewmore({ hideForm, singleClient }) {
     }
 
     useEffect(() => {
+        console.log("CLIENT:",singleClient)
         getData()
     }, [])
 
@@ -51,7 +52,7 @@ function ApprovisionnementViewmore({ hideForm, singleClient }) {
                     <ul className="flex-align gap-4">
                         <li><a href="/main" className="text-gray-200 fw-normal text-15 hover-text-main-600">Accueil</a></li>
                         <li> <span className="text-gray-500 fw-normal d-flex"><i className="ph ph-caret-right"></i></span> </li>
-                        <li><a href="/main" className="text-gray-200 fw-normal text-15 hover-text-main-600">Approvisionnements</a></li>
+                        <li><a href="/main" className="text-gray-200 fw-normal text-15 hover-text-main-600">Ventes</a></li>
                         <li> <span className="text-gray-500 fw-normal d-flex"><i className="ph ph-caret-right"></i></span> </li>
                         <li><span className="text-main-600 fw-normal text-15">Details</span></li>
                     </ul>
@@ -88,14 +89,14 @@ function ApprovisionnementViewmore({ hideForm, singleClient }) {
                     aria-labelledby="pills-details-tab" tabindex="0">
                     <div className="card mt-24">
                         <div className="card-header">
-                            <span>Date de transaction: {singleClient.purchase_date}</span><br />
-                            <span>Fournisseur: {singleClient.name}</span><br />
+                            <span>Date de transaction: {singleClient.sale_date}</span><br />
+                            <span>Client: {singleClient.customer}</span><br />
                             <span>Montant total: {get_net_value(singleClient.total_price)}</span><br />
                             <span>Montant paye: {get_net_value(singleClient.paid_amount)}</span><br />
                             <span>Montant restant: {singleClient.total_price - singleClient.paid_amount} $</span><br />
                         </div>
                         <div className="card-body">
-                            <h4 className="d-flex justify-content-center">DETAIL DE L'APPROVISIONNEMENT</h4>
+                            <h4 className="d-flex justify-content-center">DETAIL D'UNE VENTE</h4>
                             <div className="card overflow-hidden">
                                 <div className="card-body overflow-x-auto">
                                     <table id="studentTable" className="table table-bordered table-striped">
@@ -115,7 +116,7 @@ function ApprovisionnementViewmore({ hideForm, singleClient }) {
                                                         <tr key={index}>
                                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.product}</span></td>
-                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity} {item.unit}</span></td>
+                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity} {item.unite}</span></td>
                                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.unite_price)}</span></td>
                                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.quantity * item.unite_price)}</span></td>
                                                         </tr>
@@ -139,4 +140,4 @@ function ApprovisionnementViewmore({ hideForm, singleClient }) {
     </>
 }
 
-export default ApprovisionnementViewmore
+export default VenteViewmore
