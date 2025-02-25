@@ -1,19 +1,20 @@
 import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
-import SortieStockForm from "./components/SortieStockForm"
-import SortieStockViewmore from "./components/SortieStockViewmore"
+import { Dropdown } from 'react-bootstrap';
+import AcquisitionFournitureForm from "./components/AcquisitionFournitureForm"
 import Modal from 'react-bootstrap/Modal';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-function SortiStock() {
+function AcquisitionFourniturePage() {
     const [formVisible, seteFormVisible] = useState(false)
-    const [viewmoreVisible, setViewmoreVisible] = useState(false)
     const [singleClient, setSingleClient] = useState({})
     const [data, setData] = useState([])
     const [entries, setEntries] = useState([])
     const { setLoader } = useContext(MainContext);
+    const [deviseData, setDeviseData] = useState([]);
+    const [deviseValue, setDeviseValue] = useState({});
     const [modalVisible, setModalVisible] = useState(false);
     var now = new Date();
     var month = (now.getMonth() + 1);
@@ -34,7 +35,6 @@ function SortiStock() {
 
     const hideForm = () => {
         seteFormVisible(false)
-        setViewmoreVisible(false)
         getData();
         Object.keys(singleClient).forEach(function (key, index) {
             delete singleClient[key];
@@ -44,7 +44,7 @@ function SortiStock() {
     const getData = async (page = 1, q = '') => {
         try {
             setLoader(true)
-            const response = await fetch(`${BaseUrl}/getOutletStoreData?page=${page}&q=${q}`, {
+            const response = await fetch(`${BaseUrl}/getAcquisitionFournitureData?page=${page}&q=${q}`, {
                 method: 'GET',
                 headers: headerRequest
             });
@@ -53,6 +53,8 @@ function SortiStock() {
             if (res.data) {
                 setData(res.data.data);
                 setEntries(res.data);
+                setDeviseData(res.devise)
+                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type == 'devise_principale')[0])
             }
             setLoader(false)
         } catch (error) {
@@ -61,9 +63,13 @@ function SortiStock() {
         }
     }
 
-    const modelViewmore = (model) => {
-        setSingleClient(model)
-        setViewmoreVisible(true)
+    const changeDevise = (model) => {
+        setDeviseValue(model)
+    }
+
+    const get_net_value = (value) => {
+        let result = Number(value) * Number(deviseValue.conversion_amount)
+        return `${result} ${deviseValue.symbol}`
     }
 
     const searchDataFn = (searchData) => {
@@ -109,7 +115,7 @@ function SortiStock() {
     const downloadReport = async () => {
         try {
             setLoader(true)
-            const response = await fetch(`${BaseUrl}/getSortieMagsinReport`, {
+            const response = await fetch(`${BaseUrl}/getAcquisitionFournitureReport`, {
                 method: 'POST',
                 headers: headerRequest,
                 body: JSON.stringify(form)
@@ -123,7 +129,7 @@ function SortiStock() {
                 logo.src = '/assets/images/logo.png'
                 const pdf = new jsPDF();
                 pdf.setProperties({
-                    title: "Liste des transferts des produits"
+                    title: "Liste des acquisitions"
                 })
 
                 // Add images and text to the PDF
@@ -141,7 +147,7 @@ function SortiStock() {
 
                 pdf.setFontSize(15);
                 pdf.setFont('custom', 'bold');
-                pdf.text(`LISTE DES TRANSFERTS DES PRODUITS DU ${formatDate(form.date_start)} AU ${formatDate(form.date_end)}`, 20, 60);
+                pdf.text(`LISTE DES ACQUISITIONS DES FOURNITURES DU ${formatDate(form.date_start)} AU ${formatDate(form.date_end)}`, 13, 60);
 
                 pdf.setFontSize(10);
                 pdf.setFont('custom', 'bold');
@@ -153,11 +159,15 @@ function SortiStock() {
                 const itemDetailsRows = printData?.map((item, index) => [
                     (index + 1).toString(),
                     formatDate(item.transaction_date).toString(),
-                    item.service?.toString(),
-                    item.agent?.toString()
+                    item.reference?.toString(),
+                    item.supplier?.toString(),
+                    item.fourniture?.toString(),
+                    get_net_value(item.unit_price)?.toString(),
+                    item.quantity?.toString(),
+                    get_net_value(item.unit_price * item.quantity)?.toString(),
                 ]);
-                const itemDetailsHeaders = ['No', 'Date de transaction', 'Departement', 'Agent'];
-                const columnWidths = [15, 55, 50, 50];
+                const itemDetailsHeaders = ['No', 'Date', 'Reference', 'Fournisseur', 'Fourniture', 'P.U','Qte','P.T'];
+                const columnWidths = [15, 25, 25, 25, 25, 30, 20, 20];
                 // Define table styles
                 const headerStyles = {
                     fillColor: [240, 240, 240],
@@ -185,6 +195,10 @@ function SortiStock() {
                         1: { cellWidth: columnWidths[1] },
                         2: { cellWidth: columnWidths[2] },
                         3: { cellWidth: columnWidths[3] },
+                        4: { cellWidth: columnWidths[4] },
+                        5: { cellWidth: columnWidths[5] },
+                        6: { cellWidth: columnWidths[6] },
+                        7: { cellWidth: columnWidths[7] },
                     },
                     alternateRowStyles: { fillColor: [255, 255, 255] },
                     bodyStyles: {
@@ -210,7 +224,7 @@ function SortiStock() {
                 }
 
                 // Save the PDF 
-                pdf.save(`transferts des produits.pdf`);
+                pdf.save(`Liste des acquisitions.pdf`);
             }
             setLoader(false)
         } catch (error) {
@@ -224,7 +238,7 @@ function SortiStock() {
     }, [])
 
 
-    if (formVisible == false && viewmoreVisible == false) {
+    if (formVisible == false) {
         return <>
             <div className="dashboard-body">
 
@@ -235,7 +249,7 @@ function SortiStock() {
                             <li><a href="/main" className="text-gray-200 fw-normal text-15 hover-text-main-600">Accueil</a>
                             </li>
                             <li> <span className="text-gray-500 fw-normal d-flex"><i className="ph ph-caret-right"></i></span> </li>
-                            <li><span className="text-main-600 fw-normal text-15">Liste des transferts des produits</span></li>
+                            <li><span className="text-main-600 fw-normal text-15">Liste des acquisitions des fournitures</span></li>
                         </ul>
                     </div>
                     {/* Breadcrumb End */}
@@ -247,6 +261,19 @@ function SortiStock() {
                         </div>
                         <div
                             className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
+                            <Dropdown className="me-1">
+                                <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                                    {deviseValue ? deviseValue.symbol : ''}
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    {deviseData.map((item, index) => (
+                                        <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
+                                            {item.symbol}
+                                        </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
                             <button className="btn btn-success me-1" onClick={() => setModalVisible(true)}>Telecharger</button>
                             <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Ajouter</button>
                         </div>
@@ -261,9 +288,13 @@ function SortiStock() {
                             <thead>
                                 <tr>
                                     <th className="fixed-width"> #</th>
-                                    <th className="h6 text-gray-300">Date de transaction</th>
-                                    <th className="h6 text-gray-300">Departement</th>
-                                    <th className="h6 text-gray-300">Agent</th>
+                                    <th className="h6 text-gray-300">Date</th>
+                                    <th className="h6 text-gray-300">Reference</th>
+                                    <th className="h6 text-gray-300">Fournisseurs</th>
+                                    <th className="h6 text-gray-300">Fourniture</th>
+                                    <th className="h6 text-gray-300">Prix Unitaire</th>
+                                    <th className="h6 text-gray-300">Quantite</th>
+                                    <th className="h6 text-gray-300">Prix Total</th>
                                     <th className="h6 text-gray-300">Actions</th>
                                 </tr>
                             </thead>
@@ -274,16 +305,19 @@ function SortiStock() {
                                             <tr key={index}>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{formatDate(item.transaction_date)}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.service}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.agent}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.reference}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.supplier}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.fourniture}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.unit_price)}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value((item.unit_price) * (item.quantity))}</span></td>
                                                 <td>
-                                                    <button className="btn btn-main p-9 me-1" onClick={() => modelViewmore(item)}><i className="ph ph-eye text-white"></i></button>
                                                     <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
                                                 </td>
                                             </tr>
                                         ))
                                     ) : (<tr>
-                                        <td colSpan={5}>
+                                        <td colSpan={9}>
                                             <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
                                         </td>
                                     </tr>)
@@ -298,10 +332,9 @@ function SortiStock() {
                 </div>
 
             </div>
-
             <Modal show={modalVisible} onHide={hideModal} backdrop="static">
                 <Modal.Header closeButton>
-                    <Modal.Title>Rapport des Transferts des produits</Modal.Title>
+                    <Modal.Title>Rapport des Acquisitions</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="row">
@@ -324,12 +357,10 @@ function SortiStock() {
                 </Modal.Footer>
             </Modal>
         </>
-    } else if (formVisible == true && viewmoreVisible == false) {
-        return <SortieStockForm hideForm={hideForm} singleClient={singleClient} />
-    } else if (formVisible == false && viewmoreVisible == true) {
-        return <SortieStockViewmore hideForm={hideForm} singleClient={singleClient} />
+    } else if (formVisible == true) {
+        return <AcquisitionFournitureForm hideForm={hideForm} />
     }
 
 }
 
-export default SortiStock
+export default AcquisitionFourniturePage

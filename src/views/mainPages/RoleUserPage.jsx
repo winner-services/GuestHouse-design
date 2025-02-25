@@ -228,12 +228,12 @@ function RoleUserPage() {
             </Modal.Header>
             <Modal.Body>
                 <div className="col-sm-12 col-xs-12">
-                    <label for="address" className="form-label mb-8 h6">Designation</label>
+                    <label htmlFor="address" className="form-label mb-8 h6">Designation</label>
                     <input type="text" className="form-control py-11" id="address" value={roleName} onChange={(e) => { setRoleName(e.target.value) }}
                         placeholder="Entrer une designation" />
                 </div>
                 <div className="col-sm-12 col-xs-12">
-                    <label for="address" className="form-label mb-8 h6 mt-8">Permissions</label>
+                    <label htmlFor="address" className="form-label mb-8 h6 mt-8">Permissions</label>
                     {permissions.map((item, index) => (
                         <div className="form-check" key={index}>
                             <input className="form-check-input" type="checkbox" id={`formCheck${index}`} checked={selectedPermissions.includes(item.name)} value={item.name} onChange={handlePermissionChange} />

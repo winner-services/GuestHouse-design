@@ -3,7 +3,6 @@ import { MainContext } from "../../../config/MainContext";
 
 function RestoSupplyForm({ hideForm, singleClient }) {
     const [productData, setproductData] = useState([])
-    const [agentData, setagentData] = useState([])
     const [departementData, setdepartementData] = useState([])
     const [pourchase_form, setpourchase_form] = useState([]);
     const [brut_total_price, setbrut_total_price] = useState(0);
@@ -205,7 +204,7 @@ function RestoSupplyForm({ hideForm, singleClient }) {
             <div className="tab-content" id="pills-tabContent">
                 {/* My Details Tab start */}
                 <div className="tab-pane fade show active" id="pills-details" role="tabpanel"
-                    aria-labelledby="pills-details-tab" tabindex="0">
+                    aria-labelledby="pills-details-tab" tabIndex="0">
                     <div className="card mt-24">
                         <div className="card-header border-bottom">
                             <h4 className="mb-4">Nouvel Approvisionnement</h4>
@@ -214,12 +213,12 @@ function RestoSupplyForm({ hideForm, singleClient }) {
                             <form action="#">
                                 <div className="row gy-4">
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="fname" className="form-label mb-8 h6">Date de transaction</label>
+                                        <label htmlFor="fname" className="form-label mb-8 h6">Date de transaction</label>
                                         <input type="date" className="form-control py-11" id="fname" value={base_form.transaction_date} onChange={(e) => { setBaseForm({ ...base_form, transaction_date: e.target.value }) }}
                                             placeholder="Entrer une date" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="email" className="form-label mb-8 h6">Departement</label>
+                                        <label htmlFor="email" className="form-label mb-8 h6">Departement</label>
                                         <select id="" value={base_form.service_id} onChange={(e) => { setBaseForm({ ...base_form, service_id: e.target.value }) }} className="form-control py-11">
                                             <option hidden>Selectionnez un departement</option>
                                             {departementData.map((item, index) => (

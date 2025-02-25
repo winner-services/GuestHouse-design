@@ -183,12 +183,12 @@ function CompteTresoreriePage() {
             </Modal.Header>
             <Modal.Body>
             <div className="col-sm-12 col-xs-12">
-                    <label for="address" className="form-label mb-8 h6">Designation</label>
+                    <label htmlFor="address" className="form-label mb-8 h6">Designation <span className="text-danger">*</span></label>
                     <input type="text" className="form-control py-11" id="address" value={form.designation} onChange={(e) => { setForm({ ...form, designation: e.target.value }) }}
                         placeholder="Entrer une designation" />
                 </div>
                 <div className="col-sm-12 col-xs-12">
-                    <label for="address" className="form-label mb-8 h6">Reference</label>
+                    <label htmlFor="address" className="form-label mb-8 h6">Reference</label>
                     <input type="text" className="form-control py-11" id="address" value={form.reference} onChange={(e) => { setForm({ ...form, reference: e.target.value }) }}
                         placeholder="Entrer une Reference" />
                 </div>

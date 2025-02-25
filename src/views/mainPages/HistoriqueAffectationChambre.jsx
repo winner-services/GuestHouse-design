@@ -2,6 +2,9 @@ import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
 import SupplierForm from "./components/SupplierForm"
+import Modal from 'react-bootstrap/Modal';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 function HistoriqueAffectationChambre() {
     const [formVisible, seteFormVisible] = useState(false)
@@ -9,6 +12,23 @@ function HistoriqueAffectationChambre() {
     const [data, setData] = useState([])
     const [entries, setEntries] = useState([])
     const { setLoader } = useContext(MainContext);
+    const [modalVisible, setModalVisible] = useState(false);
+    var now = new Date();
+    var month = (now.getMonth() + 1);
+    var day = now.getDate();
+    if (month < 10)
+        month = "0" + month;
+    if (day < 10)
+        day = "0" + day;
+    var today = now.getFullYear() + '-' + month + '-' + day;
+    const [form, setForm] = useState({
+        date_start: today,
+        date_end: today
+    })
+    const hideModal = () => {
+        setForm({ ...form, date_end: today, date_start: today })
+        setModalVisible(false)
+    }
 
     const hideForm = () => {
         seteFormVisible(false)
@@ -46,11 +66,152 @@ function HistoriqueAffectationChambre() {
     const searchDataFn = (searchData) => {
         if (searchData) {
             let term = searchData.toLowerCase();
-            getData(1,term);
+            getData(1, term);
         } else {
             getData();
         }
     };
+
+    const downloadReport = async () => {
+        try {
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/getHistoriqueAffectationReport`, {
+                method: 'POST',
+                headers: headerRequest,
+                body: JSON.stringify(form)
+            });
+            const res = await response.json();
+            console.log("DATAs:", res.data)
+            if (res.data) {
+
+                const printData = res.data;
+                var logo = new Image()
+                logo.src = '/assets/images/logo.png'
+                const pdf = new jsPDF();
+                pdf.setProperties({
+                    title: "Occupations des chambres"
+                })
+
+                // Add images and text to the PDF
+                pdf.addImage(logo, 'png', 97, 3, 12, 20)
+                pdf.setFontSize(16);
+                pdf.setFont('custom', 'bold');
+                pdf.text('JOHN SERVICES MOTEL', 70, 27);
+                pdf.setFontSize(12);
+                pdf.setFont('custom', 'normal');
+                pdf.text('Q.les volcans, av.les messagers N° 13-B', 69, 32);
+                pdf.text('RCCM: 22-A-01622', 86, 37);
+                pdf.text('Impôt : A2315632S', 87, 42);
+                pdf.text('+243999023794', 90, 47);
+                pdf.text('johnservices@gmail.com', 83, 52);
+
+                pdf.setFontSize(15);
+                pdf.setFont('custom', 'bold');
+                pdf.text(`OCCUPATIONS DES CHAMBRES DU ${formatDate(form.date_start)} AU ${formatDate(form.date_end)}`, 30, 60);
+
+                pdf.setFontSize(10);
+                pdf.setFont('custom', 'bold');
+
+                // Line width in units (you can adjust this)
+                pdf.setLineWidth(0.1);
+
+                // Generate AutoTable for item details
+                const itemDetailsRows = printData?.map((item, index) => [
+                    (index + 1).toString(),
+                    item.reference?.toString(),
+                    "Du "+formatDate(item.start_date).toString()+" Au "+formatDate(item.end_date).toString(),
+                    item.customer?.toString(),
+                    item.room?.toString(),
+                    item.payment_status == 'paid' ? ("Soldé") : ("Non soldé")?.toString(),
+                    item.room_status?.toString(),
+                ]);
+                const itemDetailsHeaders = ['No', 'Date', 'Reference', 'Client', 'Chambre', 'Paiment','Etat Chambre'];
+                const columnWidths = [15, 35, 30, 30, 35, 20,20];
+                // Define table styles
+                const headerStyles = {
+                    fillColor: [240, 240, 240],
+                    textColor: [0],
+                    fontFamily: 'Newsreader',
+                    fontStyle: 'bold',
+                };
+                pdf.setFont('Newsreader');
+                const itemDetailsYStart = 65;
+                pdf.autoTable({
+                    head: [itemDetailsHeaders],
+                    body: itemDetailsRows,
+                    tableLineColor: 200,
+                    startY: itemDetailsYStart,
+                    headStyles: {
+                        fillColor: headerStyles.fillColor,
+                        textColor: headerStyles.textColor,
+                        fontStyle: headerStyles.fontStyle,
+                        fontSize: 10,
+                        font: 'Newsreader',
+                        halign: 'left',
+                    },
+                    columnStyles: {
+                        0: { cellWidth: columnWidths[0] },
+                        1: { cellWidth: columnWidths[1] },
+                        2: { cellWidth: columnWidths[2] },
+                        3: { cellWidth: columnWidths[3] },
+                        4: { cellWidth: columnWidths[4] },
+                        5: { cellWidth: columnWidths[5] },
+                    },
+                    alternateRowStyles: { fillColor: [255, 255, 255] },
+                    bodyStyles: {
+                        fontSize: 10,
+                        font: 'Newsreader',
+                        cellPadding: { top: 1, right: 5, bottom: 1, left: 2 },
+                        textColor: [0, 0, 0],
+                        rowPageBreak: 'avoid',
+                    },
+                    margin: { top: 10, left: 13 },
+                });
+
+                const totalPages = pdf.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.line(10, 283, 200, 283)
+                    pdf.setPage(i);
+                    pdf.setFont('Newsreader');
+                    pdf.text(
+                        `Page ${i} sur ${totalPages}`,
+                        185,
+                        pdf.internal.pageSize.getHeight() - 5
+                    );
+                }
+
+                // Save the PDF 
+                pdf.save(`Occupations des chambres.pdf`);
+            }
+            setLoader(false)
+        } catch (error) {
+            console.error("ERROR:", error);
+            setLoader(false)
+        }
+    }
+
+    function formatDate(date, includeTime = false) {
+        const dateObj = new Date(date); // Convert to Date object if it's not already
+
+        if (isNaN(dateObj)) {
+            return "Invalid Date"; // Handle invalid date inputs
+        }
+
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+
+        let formattedDate = `${day}/${month}/${year}`;
+
+        if (includeTime) {
+            const hours = String(dateObj.getHours()).padStart(2, '0');
+            const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+            const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+            formattedDate += ` ${hours}:${minutes}:${seconds}`;
+        }
+
+        return formattedDate;
+    }
 
     const getResult = (pages) => {
 
@@ -86,6 +247,11 @@ function HistoriqueAffectationChambre() {
                         <div className="position-relative text-gray-500 flex-align gap-4 text-13">
                             <input type="text" className="form-control" placeholder="Chercher..." onChange={(e) => { searchDataFn(e.target.value) }} />
                         </div>
+                        <div
+                            className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
+
+                            <button className="btn btn-success me-1" onClick={() => setModalVisible(true)}>Telecharger</button>
+                        </div>
                     </div>
                     {/* Breadcrumb Right End */}
                 </div>
@@ -101,7 +267,8 @@ function HistoriqueAffectationChambre() {
                                     <th className="h6 text-gray-300">Date</th>
                                     <th className="h6 text-gray-300">Client</th>
                                     <th className="h6 text-gray-300">Chambre</th>
-                                    <th className="h6 text-gray-300">Etat</th>
+                                    <th className="h6 text-gray-300">Paiment</th>
+                                    <th className="h6 text-gray-300">Etat Chambre</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -111,10 +278,11 @@ function HistoriqueAffectationChambre() {
                                             <tr key={index}>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.reference}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">Du {item.start_date} au {item.end_date}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">Du {formatDate(item.start_date)} au {formatDate(item.end_date)}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.customer}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.room}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.phone}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.payment_status == 'paid' ? "Soldé" : "Non soldé"}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.room_status}</span></td>
                                             </tr>
                                         ))
                                     ) : (<tr>
@@ -133,6 +301,30 @@ function HistoriqueAffectationChambre() {
                 </div>
 
             </div>
+            <Modal show={modalVisible} onHide={hideModal} backdrop="static">
+                <Modal.Header closeButton>
+                    <Modal.Title>Rapport des occupations des chambres</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="row">
+                        <div className="col-sm-6 col-xs-6">
+                            <label htmlFor="address" className="form-label mb-8 h6">Date debut</label>
+                            <input type="date" className="form-control py-11" id="address" value={form.date_start} onChange={(e) => { setForm({ ...form, date_start: e.target.value }) }}
+                            />
+                        </div>
+                        <div className="col-sm-6 col-xs-6">
+                            <label htmlFor="address" className="form-label mb-8 h6">Date fin</label>
+                            <input type="date" className="form-control py-11" id="address" value={form.date_end} onChange={(e) => { setForm({ ...form, date_end: e.target.value }) }}
+                            />
+                        </div>
+                    </div>
+
+                </Modal.Body>
+                <Modal.Footer>
+                    <button className="btn btn-outline-danger bg-danger-100 border-danger-100 text-danger-600 rounded-pill py-9" onClick={hideModal}>Annuler</button>
+                    <button type="button" className="btn btn-main rounded-pill py-9" onClick={() => downloadReport()}>Enregistrer</button>
+                </Modal.Footer>
+            </Modal>
         </>
     } else {
         return <SupplierForm hideForm={hideForm} singleSupplier={singleSupplier} />

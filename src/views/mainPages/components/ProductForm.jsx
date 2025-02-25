@@ -218,7 +218,7 @@ function ProductForm({ hideForm, singleProduct }) {
             <div className="tab-content" id="pills-tabContent">
                 {/* My Details Tab start */}
                 <div className="tab-pane fade show active" id="pills-details" role="tabpanel"
-                    aria-labelledby="pills-details-tab" tabindex="0">
+                    aria-labelledby="pills-details-tab" tabIndex="0">
                     <div className="card mt-24">
                         <div className="card-header border-bottom">
                             <h4 className="mb-4">{form.id?"Modification du":"Nouveau"} Produit</h4>
@@ -227,12 +227,12 @@ function ProductForm({ hideForm, singleProduct }) {
                             <form action="#">
                                 <div className="row gy-4">
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="fname" className="form-label mb-8 h6">Designation</label>
+                                        <label htmlFor="fname" className="form-label mb-8 h6">Designation <span className="text-danger">*</span></label>
                                         <input type="text" className="form-control py-11" id="fname" value={form.designation} onChange={(e) => { setForm({ ...form, designation: e.target.value }) }}
                                             placeholder="Entrer le designation" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="lname" className="form-label mb-8 h6 me-1">Categorie</label><button type="button" className="btn btn-secondary rounded-pill py-2" onClick={() => showCategModal()}>Ajouter +</button>
+                                        <label htmlFor="lname" className="form-label mb-8 h6 me-1">Categorie <span className="text-danger">*</span></label><button type="button" className="btn btn-secondary rounded-pill py-2" onClick={() => showCategModal()}>Ajouter +</button>
                                         <select className="form-control py-11" value={form.category_id} onChange={(e) => { setForm({ ...form, category_id: e.target.value }) }}>
                                             <option hidden>Selectionner une option</option>
                                             {categoryData.map((item, index) => (
@@ -241,36 +241,36 @@ function ProductForm({ hideForm, singleProduct }) {
                                         </select>
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="lname" className="form-label mb-8 h6 me-1">Unité</label><button type="button" className="btn btn-secondary rounded-pill py-2" onClick={() => showUnitModal()}>Ajouter +</button>
+                                        <label htmlFor="lname" className="form-label mb-8 h6 me-1">Unité <span className="text-danger">*</span></label><button type="button" className="btn btn-secondary rounded-pill py-2" onClick={() => showUnitModal()}>Ajouter +</button>
                                         <select className="form-control py-11" value={form.unit_id} onChange={(e) => { setForm({ ...form, unit_id: e.target.value }) }}>
                                             <option hidden>Selectionner une option</option>
                                             {unitData.map((item, index) => (
-                                                <option value={item.id} key={index}>{item.designation}</option>
+                                                <option value={item.id} key={index}>{item.description} | {item.designation}</option>
                                             ))}
                                         </select>
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="address" className="form-label mb-8 h6">Quantité en stock</label>
+                                        <label htmlFor="address" className="form-label mb-8 h6">Quantité en stock</label>
                                         <input type="number" className="form-control py-11" id="address" value={form.quantity} onChange={(e) => { setForm({ ...form, quantity: e.target.value }) }}
                                             placeholder="Entrer une Quantité" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="address" className="form-label mb-8 h6">Quantité minimale</label>
+                                        <label htmlFor="address" className="form-label mb-8 h6">Quantité minimale</label>
                                         <input type="number" className="form-control py-11" id="address" value={form.minimum_quantity} onChange={(e) => { setForm({ ...form, minimum_quantity: e.target.value }) }}
                                             placeholder="Entrer une Quantité minimale" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="address" className="form-label mb-8 h6">Prix d'achat</label>
+                                        <label htmlFor="address" className="form-label mb-8 h6">Prix d'achat <span className="text-danger">*</span></label>
                                         <input type="number" className="form-control py-11" id="address" value={form.purchase_price} onChange={(e) => { setForm({ ...form, purchase_price: e.target.value }) }}
                                             placeholder="Entrer un Prix d'achat" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="address" className="form-label mb-8 h6">Prix de vente</label>
+                                        <label htmlFor="address" className="form-label mb-8 h6">Prix de vente <span className="text-danger">*</span></label>
                                         <input type="number" className="form-control py-11" id="address" value={form.selling_price} onChange={(e) => { setForm({ ...form, selling_price: e.target.value }) }}
                                             placeholder="Entrer un Prix de vente" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="address" className="form-label mb-8 h6">Image du produit</label>
+                                        <label htmlFor="address" className="form-label mb-8 h6">Image du produit</label>
                                         <input type="file" className="form-control py-11" id="address" onChange={onFileChange}
                                             placeholder="Entrer une image" />
                                     </div>
@@ -306,12 +306,12 @@ function ProductForm({ hideForm, singleProduct }) {
             </Modal.Header>
             <Modal.Body>
                 <div className="col-sm-12 col-xs-12">
-                    <label for="address" className="form-label mb-8 h6">{unitFormVisible?"Abréviation":"Designation"}</label>
+                    <label htmlFor="address" className="form-label mb-8 h6">{unitFormVisible?"Abréviation":"Designation"}</label>
                     <input type="text" className="form-control py-11" id="address" value={unitForm.designation} onChange={(e) => { setUnitForm({ ...unitForm, designation: e.target.value }) }}
                         placeholder={unitFormVisible?"Ajouter une abréviation":"Ajouter une designation"} />
                 </div>
                 <div className="col-sm-12 col-xs-12">
-                    <label for="address" className="form-label mb-8 h6">{unitFormVisible?"Designation":"Description"}</label>
+                    <label htmlFor="address" className="form-label mb-8 h6">{unitFormVisible?"Designation":"Description"}</label>
                     <input type="text" className="form-control py-11" id="address" value={unitForm.description} onChange={(e) => { setUnitForm({ ...unitForm, description: e.target.value }) }}
                         placeholder={unitFormVisible?"Entrer une Designation":"Entrer une Description"} />
                 </div>

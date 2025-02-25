@@ -13,22 +13,26 @@
     }); 
 
     // Remove Dropdown Menu
-    $('.close-dropdown').on('click', function () {
-      $('.dropdown-menu').removeClass('show'); 
-      $('.dropdown-btn').removeClass('show'); 
-      $('.dropdown-btn').setAttribute('aria-expanded', 'false')
-    }); 
+    // $('.close-dropdown').on('click', function () {
+    //   $('.dropdown-menu').removeClass('show'); 
+    //   $('.dropdown-btn').removeClass('show'); 
+    //   $('.dropdown-btn').setAttribute('aria-expanded', 'false')
+    // }); 
   // =========================== Dropdown menu Js End =======================
 
 
   // =========================== Submenu Open & Close Js Start =======================
-  $('.has-dropdown').on('click', function () {
-    $('.has-dropdown').removeClass('activePage'); 
-    $('.has-dropdown').not($(this)).find('.sidebar-submenu').slideUp(400); 
-    
-    $(this).find('.sidebar-submenu').slideToggle(400); 
-    $(this).toggleClass('activePage'); 
-  }); 
+  $('.has-dropdown > a').on('click', function (event) { // Target the <a> tag directly
+    event.preventDefault(); // Prevent default link behavior (if needed)
+
+    $(this).parent('.has-dropdown').toggleClass('activePage'); // Toggle on the parent <li>
+
+    $('.has-dropdown').not($(this).parent('.has-dropdown')).removeClass('activePage');
+    $('.has-dropdown').not($(this).parent('.has-dropdown')).find('.sidebar-submenu').slideUp(400);
+
+    $(this).parent('.has-dropdown').find('.sidebar-submenu').slideToggle(400);
+
+});
 
   // $('.sidebar-menu__item.activePage').find('.sidebar-submenu').slideDown(400);
   // =========================== Submenu Open & Close Js End =======================
@@ -62,9 +66,11 @@
   
 
   //  =========================== Submenu Open & Active Dropdown menu while page active ========================
+  $(document).ready(function() { // Ensure this runs after the DOM is fully loaded
     if ($('.sidebar-menu__item').hasClass('activePage')) {
       $('.sidebar-menu__item.activePage').find('.sidebar-submenu').slideDown(400); 
     }
+});
   //  =========================== Submenu Open & Active Dropdown menu while page active End ========================
 
 

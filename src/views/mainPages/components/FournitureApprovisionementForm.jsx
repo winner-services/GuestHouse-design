@@ -5,8 +5,7 @@ function FournitureApprovisionementForm({ hideForm }) {
     const [fournitureData, setfournitureData] = useState([])
     const [agentData, setagentData] = useState([])
     const [pourchase_form, setpourchase_form] = useState([]);
-    const [compte_data, setcompte_data] = useState([]);
-    const [brut_total_price, setbrut_total_price] = useState(0);
+    const [supplierData, setsupplierData] = useState([])
 
     var now = new Date();
     var month = (now.getMonth() + 1);
@@ -20,6 +19,7 @@ function FournitureApprovisionementForm({ hideForm }) {
         agent_id: "",
         total_price: 0,
         compte_id: "",
+        supplier_id: "",
         order_date: today,
     })
 
@@ -150,9 +150,29 @@ function FournitureApprovisionementForm({ hideForm }) {
         });
     };
 
+    const getSupplierOptions = async () => {
+        try {
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/getSupplierOptions`, {
+                method: 'GET',
+                headers: headerRequest
+            });
+            const res = await response.json();
+            console.log("DATAs:", res.data)
+            if (res.data) {
+                setsupplierData(res.data);
+            }
+            setLoader(false)
+        } catch (error) {
+            console.error("ERROR:", error);
+            setLoader(false)
+        }
+    }
+
     useEffect(() => {
         getAgentOptions()
         getFournitureOptions()
+        getSupplierOptions()
     }, [])
 
     return <>
@@ -192,16 +212,25 @@ function FournitureApprovisionementForm({ hideForm }) {
                         <div className="card-body">
                             <form action="#">
                                 <div className="row gy-4">
-                                    <div className="col-sm-6 col-xs-6">
-                                        <label htmlFor="fname" className="form-label mb-8 h6">Date de transaction</label>
+                                    <div className="col-sm-4 col-xs-6">
+                                        <label htmlFor="fname" className="form-label mb-8 h6">Date de transaction <span className="text-danger">*</span></label>
                                         <input type="date" className="form-control py-11" id="fname" value={base_form.order_date} onChange={(e) => { setBaseForm({ ...base_form, order_date: e.target.value }) }}
                                             placeholder="Entrer une date" />
                                     </div>
-                                    <div className="col-sm-6 col-xs-6">
-                                        <label htmlFor="email" className="form-label mb-8 h6">Agent</label>
+                                    <div className="col-sm-4 col-xs-6">
+                                        <label htmlFor="email" className="form-label mb-8 h6">Agent <span className="text-danger">*</span></label>
                                         <select id="" value={base_form.agent_id} onChange={(e) => { setBaseForm({ ...base_form, agent_id: e.target.value }) }} className="form-control py-11">
                                             <option hidden>Selectionnez un agent</option>
                                             {agentData.map((item, index) => (
+                                                <option value={item.id} key={index}>{item.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="col-sm-4 col-xs-6">
+                                        <label htmlFor="email" className="form-label mb-8 h6">Fournisseur</label>
+                                        <select id="" value={base_form.supplier_id} onChange={(e) => { setBaseForm({ ...base_form, supplier_id: e.target.value }) }} className="form-control py-11">
+                                            <option hidden>Selectionnez un fournisseur</option>
+                                            {supplierData.map((item, index) => (
                                                 <option value={item.id} key={index}>{item.name}</option>
                                             ))}
                                         </select>
@@ -213,9 +242,9 @@ function FournitureApprovisionementForm({ hideForm }) {
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th style={{ width: '40%' }}>Fourniture</th>
-                                                        <th>Qté</th>
-                                                        <th>Prix Unitaire</th>
+                                                        <th style={{ width: '40%' }}>Fourniture <span className="text-danger">*</span></th>
+                                                        <th>Qté <span className="text-danger">*</span></th>
+                                                        <th>Prix Unitaire <span className="text-danger">*</span></th>
                                                         <th>P.T</th>
                                                         <th>Action</th>
                                                     </tr>

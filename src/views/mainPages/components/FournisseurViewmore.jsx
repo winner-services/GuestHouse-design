@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../../config/MainContext";
 import Modal from 'react-bootstrap/Modal';
 import { Dropdown } from 'react-bootstrap';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 function FournisseurViewmore({ hideForm, singleSupplier }) {
     const [data, setData] = useState([])
@@ -69,6 +71,139 @@ function FournisseurViewmore({ hideForm, singleSupplier }) {
         }
 
     }
+
+    function formatDate(date, includeTime = false) {
+        const dateObj = new Date(date); // Convert to Date object if it's not already
+      
+        if (isNaN(dateObj)) {
+          return "Invalid Date"; // Handle invalid date inputs
+        }
+      
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+      
+        let formattedDate = `${day}/${month}/${year}`;
+      
+        if (includeTime) {
+          const hours = String(dateObj.getHours()).padStart(2, '0');
+          const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+          const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+          formattedDate += ` ${hours}:${minutes}:${seconds}`;
+        }
+      
+        return formattedDate;
+      }
+
+    const downloadReport = async () => {
+            try {
+                const printData = data;
+                var logo = new Image()
+                logo.src = '/assets/images/logo.png'
+                const pdf = new jsPDF();
+                pdf.setProperties({
+                    title: "Liste des dettes du fournisseur"
+                })
+    
+                // Add images and text to the PDF
+                pdf.addImage(logo, 'png', 97, 3, 12, 20)
+                pdf.setFontSize(16);
+                pdf.setFont('custom', 'bold');
+                pdf.text('JOHN SERVICES MOTEL', 70, 27);
+                pdf.setFontSize(12);
+                pdf.setFont('custom', 'normal');
+                pdf.text('Q.les volcans, av.les messagers N° 13-B', 69, 32);
+                pdf.text('RCCM: 22-A-01622', 86, 37);
+                pdf.text('Impôt : A2315632S', 87, 42);
+                pdf.text('+243999023794', 90, 47);
+                pdf.text('johnservices@gmail.com', 83, 52);
+    
+                pdf.setFontSize(15);
+                pdf.setFont('custom', 'bold');
+                pdf.text('LISTE DES DETTES DU FOURNISSEUR', 57, 60);
+    
+                pdf.setFontSize(10);
+                pdf.setFont('custom', 'normal');
+                pdf.text(`Nom : ${singleSupplier.name}`, 13, 70);
+                pdf.text(`Genre : ${singleSupplier.gender}`, 13, 75);
+                pdf.text(`Addresse : ${singleSupplier.address}`, 13, 80);
+                pdf.text(`Telephone : ${singleSupplier.phone}`, 13, 85);
+                pdf.text(`Email : ${singleSupplier.email}`, 13, 90);
+    
+                // Line width in units (you can adjust this)
+                pdf.setLineWidth(0.1);
+    
+                // Generate AutoTable for item details
+                const itemDetailsRows = printData?.map((item, index) => [
+                    (index + 1).toString(),
+                    formatDate(item.transaction_date).toString(),
+                    item.motif?.toString(),
+                    item.loan_amount.toString(),
+                    item.paid_amount.toString(),
+                    (item.loan_amount - item.paid_amount) + " $"?.toString(),
+                ]);
+                const itemDetailsHeaders = ['No', 'Date', 'Motif', 'Montant Total', 'Deja Payé', 'Montant Restant'];
+                const columnWidths = [15, 30, 55, 30, 30, 30];
+                // Define table styles
+                const headerStyles = {
+                    fillColor: [240, 240, 240],
+                    textColor: [0],
+                    fontFamily: 'Newsreader',
+                    fontStyle: 'bold',
+                };
+                pdf.setFont('Newsreader');
+                const itemDetailsYStart = 97;
+                pdf.autoTable({
+                    head: [itemDetailsHeaders],
+                    body: itemDetailsRows,
+                    tableLineColor: 200,
+                    startY: itemDetailsYStart,
+                    headStyles: {
+                        fillColor: headerStyles.fillColor,
+                        textColor: headerStyles.textColor,
+                        fontStyle: headerStyles.fontStyle,
+                        fontSize: 10,
+                        font: 'Newsreader',
+                        halign: 'left',
+                    },
+                    columnStyles: {
+                        0: { cellWidth: columnWidths[0] },
+                        1: { cellWidth: columnWidths[1] },
+                        2: { cellWidth: columnWidths[2] },
+                        3: { cellWidth: columnWidths[3] },
+                        4: { cellWidth: columnWidths[4] },
+                        5: { cellWidth: columnWidths[5] },
+                    },
+                    alternateRowStyles: { fillColor: [255, 255, 255] },
+                    bodyStyles: {
+                        fontSize: 10,
+                        font: 'Newsreader',
+                        cellPadding: { top: 1, right: 5, bottom: 1, left: 2 },
+                        textColor: [0, 0, 0],
+                        rowPageBreak: 'avoid',
+                    },
+                    margin: { top: 10, left: 13 },
+                });
+    
+                const totalPages = pdf.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.line(10, 283, 200, 283)
+                    pdf.setPage(i);
+                    pdf.setFont('Newsreader');
+                    pdf.text(
+                        `Page ${i} sur ${totalPages}`,
+                        185,
+                        pdf.internal.pageSize.getHeight() - 5
+                    );
+                }
+    
+                // Save the PDF 
+                pdf.save(`Liste des dettes du fournisseur.pdf`);
+            } catch (error) {
+                console.error("ERROR:", error);
+                setLoader(false)
+            }
+        }
 
     const submitData = async (e) => {
         e.preventDefault()
@@ -143,6 +278,7 @@ function FournisseurViewmore({ hideForm, singleSupplier }) {
                             </Dropdown.Menu>
                         </Dropdown>
                         <button className="btn btn-secondary me-1" onClick={hideForm}>Retour</button>
+                        <button className="btn btn-success me-1" onClick={() => downloadReport()}>Telecharger</button>
                         {data.length > 0 ?(
                             <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Paiement</button>
                         ):null}
@@ -185,7 +321,7 @@ function FournisseurViewmore({ hideForm, singleSupplier }) {
                                                     data.map((item, index) => (
                                                         <tr key={index}>
                                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
-                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.transaction_date}</span></td>
+                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{formatDate(item.transaction_date)}</span></td>
                                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.motif}</span></td>
                                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.loan_amount)}</span></td>
                                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.paid_amount)}</span></td>
@@ -222,12 +358,12 @@ function FournisseurViewmore({ hideForm, singleSupplier }) {
             </Modal.Header>
             <Modal.Body>
                 <div className="col-sm-12 col-xs-12">
-                    <label for="transaction_date" className="form-label mb-8 h6">Date de transaction</label>
+                    <label htmlFor="transaction_date" className="form-label mb-8 h6">Date de transaction</label>
                     <input type="date" className="form-control py-11" id="transaction_date" value={form.transaction_date} onChange={(e) => { setForm({ ...form, transaction_date: e.target.value }) }}
                         placeholder="Entrer une date" />
                 </div>
                 <div className="col-sm-12 col-xs-12">
-                    <label for="amount" className="form-label mb-8 h6">Montant a payer</label>
+                    <label htmlFor="amount" className="form-label mb-8 h6">Montant a payer</label>
                     <input type="number" className="form-control py-11" id="amount" value={form.paid_amount} onChange={(e) => { setForm({ ...form, paid_amount: e.target.value }) }}
                         placeholder="Entrer un montant" />
                 </div>

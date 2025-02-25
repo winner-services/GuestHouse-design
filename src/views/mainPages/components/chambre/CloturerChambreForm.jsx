@@ -37,7 +37,7 @@ function CloturerChambreForm({hideForm, singleRoom}) {
             });
             const res = await response.json();
             if (res.success) {
-                toastr.success("Un departement a ete insere avec success", "Success");
+                toastr.success("Une chambre a ete reserve avec success", "Success");
                 hideForm(false)
                 Object.keys(form).forEach(function (key, index) {
                     delete form[key];

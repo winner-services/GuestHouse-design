@@ -3,6 +3,10 @@ import { NavLink } from "react-router-dom"
 function SidebarPage() {
     let userdata = JSON.parse(localStorage.getItem('user'))
     let permissions = userdata.permissions
+    const handleSubmenuClick = (event) => {
+        event.stopPropagation(); // Prevent the click from closing the parent dropdown
+        // ... your other logic for the submenu item click (e.g., navigation) ...
+    };
 
     return <>
         <aside className="sidebar">
@@ -44,6 +48,7 @@ function SidebarPage() {
                             </li>
                         ) : null}
 
+
                         {permissions.includes("Gérer Magasin") ? (
                             <li className="sidebar-menu__item has-dropdown">
                                 <a href="#" className="sidebar-menu__link">
@@ -52,18 +57,50 @@ function SidebarPage() {
                                 </a>
 
                                 <ul className="sidebar-submenu">
+
                                     <li className="sidebar-submenu__item">
-                                        <NavLink to="/main/products" className="sidebar-submenu__link"> Produits </NavLink>
+                                        <div className="btn-group">
+                                            <a href="#" className="sidebar-submenu__link" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Restaurant
+                                            </a>
+                                            <ul className="dropdown-menu">
+                                                <li><NavLink to="/main/products" className="dropdown-item">Produits</NavLink></li>
+                                                <li><NavLink to="/main/pourchases" className="dropdown-item">Approvisionnements</NavLink></li>
+                                                <li><NavLink to="/main/sortie-stock" className="dropdown-item">Tranfert Stock</NavLink></li>
+                                            </ul>
+                                        </div>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <NavLink to="/main/pourchases" className="sidebar-submenu__link"> Approvisionnements </NavLink>
+                                        <div className="btn-group">
+                                            <a href="#" className="sidebar-submenu__link" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Hotellerie
+                                            </a>
+                                            <ul className="dropdown-menu">
+                                                <li><NavLink to="/main/fournitures" className="dropdown-item">Autres Fournitures</NavLink></li>
+                                                <li><NavLink to="/main/fournitures-approvisionement" className="dropdown-item">Approvisionnements</NavLink></li>
+                                                <li><NavLink to="/main/fournitures-acquisition" className="dropdown-item">Acquisitions</NavLink></li>
+                                            </ul>
+                                        </div>
                                     </li>
-                                    <li className="sidebar-submenu__item">
-                                        <NavLink to="/main/sortie-stock" className="sidebar-submenu__link"> Tranfert Stock </NavLink>
-                                    </li>
+
                                 </ul>
+                                {/* <ul className="sidebar-submenu">
+
+
+                                <li className="sidebar-submenu__item">
+                                    <NavLink to="/main/products" className="sidebar-submenu__link"> Produits </NavLink>
+                                </li>
+                                <li className="sidebar-submenu__item">
+                                    <NavLink to="/main/pourchases" className="sidebar-submenu__link"> Approvisionnements </NavLink>
+                                </li>
+                                <li className="sidebar-submenu__item">
+                                    <NavLink to="/main/sortie-stock" className="sidebar-submenu__link"> Tranfert Stock </NavLink>
+                                </li>
+                            </ul> */}
                             </li>
                         ) : null}
+                        
+
 
                         {permissions.includes("Gérer Cuisine") ? (
                             <li className="sidebar-menu__item has-dropdown">
@@ -80,7 +117,7 @@ function SidebarPage() {
                             </li>
                         ) : null}
 
-                        {permissions.includes("Gérer Fournitures") ? (
+                        {/* {permissions.includes("Gérer Fournitures") ? (
                             <li className="sidebar-menu__item has-dropdown">
                                 <a href="#" className="sidebar-menu__link">
                                     <span className="icon"><i className="ph ph-table"></i></span>
@@ -97,7 +134,7 @@ function SidebarPage() {
                                 </ul>
 
                             </li>
-                        ) : null}
+                        ) : null} */}
 
                         {permissions.includes("Gérer Hôtellerie") ? (
                             <li className="sidebar-menu__item has-dropdown">
@@ -111,7 +148,10 @@ function SidebarPage() {
                                         <NavLink to="/main/affectations-chambres" className="sidebar-submenu__link"> Affectations </NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
-                                        <NavLink to="/main/affectations-chambres-historique" className="sidebar-submenu__link"> Historique </NavLink>
+                                        <NavLink to="/main/affectations-chambres-historique" className="sidebar-submenu__link"> Historique</NavLink>
+                                    </li>
+                                    <li className="sidebar-submenu__item">
+                                        <NavLink to="/main/affectations-edited-chambres-historique" className="sidebar-submenu__link"> Historique Modifiées</NavLink>
                                     </li>
                                 </ul>
                             </li>
@@ -126,7 +166,7 @@ function SidebarPage() {
 
                                 <ul className="sidebar-submenu">
                                     <li className="sidebar-submenu__item">
-                                        <NavLink to="/main/restaurant-supply" className="sidebar-submenu__link"> Approvisionnements </NavLink>
+                                        <NavLink to="/main/restaurant-supply" className="sidebar-submenu__link"> Gestion Commandes </NavLink>
                                     </li>
                                     <li className="sidebar-submenu__item">
                                         <NavLink to="/main/ventes" className="sidebar-submenu__link">Point de Vente </NavLink>

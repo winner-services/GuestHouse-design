@@ -1,7 +1,9 @@
 import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../../config/MainContext";
 
-function TransactionTresorerieForm({ hideForm, singleClient }) {
+function AcquisitionFournitureForm({ hideForm }) {
+    const [fournitureData, setfournitureData] = useState([])
+    const [supplierData, setsupplierData] = useState([])
     var now = new Date();
     var month = (now.getMonth() + 1);
     var day = now.getDate();
@@ -11,31 +13,25 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
         day = "0" + day;
     var today = now.getFullYear() + '-' + month + '-' + day;
     const [form, setForm] = useState({
-        transaction_date: today,
-        amount: 1,
-        motif: "",
-        account_id: "",
-        category_id: "",
-        transaction_type:"",
+        transaction_date:today,
+        detail_order_id: "",
+        quantity: 0,
+        unit_price: 0,
+        supplier_id: "",
+        reference:""
     })
 
     const { setLoader } = useContext(MainContext);
-    const [comptetData, setCompteData] = useState([])
-    const [compteAccountData, setCompteAccountData] = useState([])
 
     const submitData = async (e) => {
         e.preventDefault()
 
-        let url = `createTransactionTreasury`
+        let url = `createAcquisitionSupplies`
         let method = 'POST'
-        if (form.id) {
-            url = `updateTransactionTreasury/${singleClient.id}`
-            method = 'PUT'
-            // insertUpdateFn(url, method, form)
-        }
 
         setLoader(true)
         try {
+
             const response = await fetch(`${BaseUrl}/${url}`, {
                 method: method,
                 headers: headerRequest,
@@ -43,7 +39,7 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
             });
             const res = await response.json();
             if (res.success) {
-                toastr.success("Une transaction a ete insere avec success", "Success");
+                toastr.success("Une acquisition a ete insere avec success", "Success");
                 hideForm(false)
                 Object.keys(form).forEach(function (key, index) {
                     delete form[key];
@@ -62,17 +58,17 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
         }
     }
 
-    const getCompteOptions = async () => {
+    const getFournitureOptions = async () => {
         try {
             setLoader(true)
-            const response = await fetch(`${BaseUrl}/getAllAccounts`, {
+            const response = await fetch(`${BaseUrl}/getFournitureValidesData`, {
                 method: 'GET',
                 headers: headerRequest
             });
             const res = await response.json();
             console.log("DATAs:", res.data)
             if (res.data) {
-                setCompteData(res.data);
+                setfournitureData(res.data);
             }
             setLoader(false)
         } catch (error) {
@@ -81,17 +77,17 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
         }
     }
 
-    const getCompteAccountOptions = async () => {
+    const getSupplierOptions = async () => {
         try {
             setLoader(true)
-            const response = await fetch(`${BaseUrl}/getSpentCategoryOptions`, {
+            const response = await fetch(`${BaseUrl}/getSupplierOptions`, {
                 method: 'GET',
                 headers: headerRequest
             });
             const res = await response.json();
             console.log("DATAs:", res.data)
             if (res.data) {
-                setCompteAccountData(res.data);
+                setsupplierData(res.data);
             }
             setLoader(false)
         } catch (error) {
@@ -101,19 +97,8 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
     }
 
     useEffect(() => {
-        getCompteOptions()
-        getCompteAccountOptions()
-        if (Object.values(singleClient).length > 0) {
-            console.log(singleClient)
-            for (const key in singleClient) {
-                if (Object.hasOwnProperty.call(form, key)) {
-                    const element = singleClient[key];
-                    form[key] = element;
-                    setForm({ ...form, [key]: element })
-                }
-            }
-            setForm({ ...form, id: singleClient.id })
-        }
+        getFournitureOptions()
+        getSupplierOptions()
     }, [])
 
     return <>
@@ -126,7 +111,7 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
                         <li><a href="/main" className="text-gray-200 fw-normal text-15 hover-text-main-600">Accueil</a>
                         </li>
                         <li> <span className="text-gray-500 fw-normal d-flex"><i className="ph ph-caret-right"></i></span> </li>
-                        <li><span className="text-main-600 fw-normal text-15">Transaction Financieres</span></li>
+                        <li><span className="text-main-600 fw-normal text-15">Acquisition des fournitures</span></li>
                     </ul>
                 </div>
                 {/* Breadcrumb End */}
@@ -148,57 +133,62 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
                     aria-labelledby="pills-details-tab" tabIndex="0">
                     <div className="card mt-24">
                         <div className="card-header border-bottom">
-                            <h4 className="mb-4">Nouvelle Transaction</h4>
+                            <h4 className="mb-4">{form.id ? "Modification du" : "Nouvelle"} Acquisition</h4>
                         </div>
                         <div className="card-body">
                             <form action="#">
                                 <div className="row gy-4">
                                     <div className="col-sm-6 col-xs-6">
-                                        <label htmlFor="fname" className="form-label mb-8 h6">Date transaction <span className="text-danger">*</span></label>
-                                        <input type="date" className="form-control py-11" id="fname" value={form.transaction_date} onChange={(e) => { setForm({ ...form, transaction_date: e.target.value }) }}
-                                            placeholder="Entrer une date" />
+                                        <label htmlFor="transaction_date" className="form-label mb-8 h6">Date transaction <span className="text-danger">*</span></label>
+                                        <input type="date" className="form-control py-11" id="transaction_date" value={form.transaction_date} onChange={(e) => { setForm({ ...form, transaction_date: e.target.value }) }}
+                                            placeholder="Entrer la date de transaction" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label htmlFor="address" className="form-label mb-8 h6">Montant <span className="text-danger">*</span></label>
-                                        <input type="number" className="form-control py-11" id="address" value={form.amount} onChange={(e) => { setForm({ ...form, amount: e.target.value }) }}
-                                            placeholder="Entrer un montant" />
+                                        <label htmlFor="part_number" className="form-label mb-8 h6">Reference <span className="text-danger">*</span></label>
+                                        <input type="text" className="form-control py-11" id="part_number" value={form.reference} onChange={(e) => { setForm({ ...form, reference: e.target.value }) }}
+                                            placeholder="Entrer le numero de reference" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label htmlFor="motif" className="form-label mb-8 h6">Motif <span className="text-danger">*</span></label>
-                                        <input type="text" className="form-control py-11" id="motif" value={form.motif} onChange={(e) => { setForm({ ...form, motif: e.target.value }) }}
-                                            placeholder="Entrer un motif" />
-                                    </div>
-                                    <div className="col-sm-6 col-xs-6">
-                                        <label htmlFor="lname" className="form-label mb-8 h6 me-1">Compte de tresorerie <span className="text-danger">*</span></label>
-                                        <select className="form-control py-11" value={form.account_id} onChange={(e) => { setForm({ ...form, account_id: e.target.value }) }}>
-                                            <option hidden>Selectionner une option</option>
-                                            {comptetData.map((item, index) => (
-                                                <option value={item.id} key={index}>{item.designation}</option>
+                                        <label htmlFor="lname" className="form-label mb-8 h6">Fourniture <span className="text-danger">*</span></label>
+                                        <select id="" value={form.order_supplies_id} onChange={(e) => {
+                                            setForm({
+                                                ...form,
+                                                fourniture_id: e.target.value,
+                                                quantity: fournitureData.find((item) => item.id == e.target.value).quantity,
+                                                unit_price: fournitureData.find((item) => item.id == e.target.value).unit_price,
+                                                detail_order_id: fournitureData.find((item) => item.id == e.target.value).order_supplies_id,
+                                            })
+                                        }} className="form-control">
+                                            <option hidden>Fournitures</option>
+                                            {fournitureData.map((item, index) => (
+                                                <option value={item.id} key={index}>{item.fournitures}</option>
                                             ))}
                                         </select>
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label htmlFor="lname" className="form-label mb-8 h6 me-1">Compte comptables <span className="text-danger">*</span></label>
-                                        <select className="form-control py-11" value={form.category_id} onChange={(e) => { setForm({ ...form, category_id: e.target.value }) }}>
-                                            <option hidden>Selectionner une option</option>
-                                            {compteAccountData.map((item, index) => (
-                                                <option value={item.id} key={index}>{item.designation}</option>
+                                        <label htmlFor="address" className="form-label mb-8 h6">Quantité <span className="text-danger">*</span></label>
+                                        <input type="number" className="form-control py-11" id="address" value={form.quantity} onChange={(e) => { setForm({ ...form, quantity: e.target.value }) }}
+                                            placeholder="Entrer une quantité" />
+                                    </div>
+                                    <div className="col-sm-6 col-xs-6">
+                                        <label htmlFor="email" className="form-label mb-8 h6">Prix Unitaire</label>
+                                        <input type="number" className="form-control py-11" id="email" value={form.unit_price} onChange={(e) => { setForm({ ...form, unit_price: e.target.value }) }}
+                                            placeholder="Entrer un prix unitaire" />
+                                    </div>
+                                    <div className="col-sm-6 col-xs-6">
+                                        <label htmlFor="Piece" className="form-label mb-8 h6">Fournisseur</label>
+                                        <select id="" value={form.supplier_id} onChange={(e) => { setForm({ ...form, supplier_id: e.target.value }) }} className="form-control py-11">
+                                            <option hidden>Selectionnez un fournisseur</option>
+                                            {supplierData.map((item, index) => (
+                                                <option value={item.id} key={index}>{item.name}</option>
                                             ))}
                                         </select>
                                     </div>
-                                    <div className="col-sm-6 col-xs-6">
-                                        <label htmlFor="lname" className="form-label mb-8 h6 me-1">Type de transaction <span className="text-danger">*</span></label>
-                                        <select className="form-control py-11" value={form.transaction_type} onChange={(e) => { setForm({ ...form, transaction_type: e.target.value }) }}>
-                                            <option hidden>Selectionner une option</option>
-                                            <option value="RECETTE">Recette</option>
-                                            <option value="DEPENSE">Depense</option>
-                                            
-                                        </select>
-                                    </div>
+
                                     <div className="col-12">
                                         <div className="flex-align justify-content-end gap-8">
                                             <button className="btn btn-outline-danger bg-danger-100 border-danger-100 text-danger-600 rounded-pill py-9" onClick={hideForm}>Annuler</button>
-                                            <button type="button" className="btn btn-main rounded-pill py-9" onClick={submitData}>Enregistrer</button>
+                                            <button type="button" className="btn btn-main rounded-pill py-9" onClick={submitData}>{form.id ? "Modifier" : "Enregistrer"}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -212,4 +202,4 @@ function TransactionTresorerieForm({ hideForm, singleClient }) {
     </>
 }
 
-export default TransactionTresorerieForm
+export default AcquisitionFournitureForm

@@ -47,7 +47,7 @@ function DepartementPage() {
         let url = `createService`
         let method = 'POST'
         if (form.id) {
-            url = `updateService/${singleClient.id}`
+            url = `updateService/${form.id}`
             method = 'PUT'
             // insertUpdateFn(url, method, form)
         }
@@ -82,7 +82,7 @@ function DepartementPage() {
     }
 
     const modelUpdate = (model) => {
-        setSingleClient(model)
+        setForm({ designation: model.designation, id: model.id })
         seteFormVisible(true)
     }
 
@@ -155,7 +155,7 @@ function DepartementPage() {
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.designation}</span></td>
                                             <td>
-                                            <button className="btn btn-main p-9 me-1" onClick={() => modelDette(item)}><i className="ph ph-pen text-white"></i></button>
+                                            <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
                                             <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
                                             </td>
                                         </tr>
@@ -182,7 +182,7 @@ function DepartementPage() {
             </Modal.Header>
             <Modal.Body>
                 <div className="col-sm-12 col-xs-12">
-                    <label for="address" className="form-label mb-8 h6">Designation</label>
+                    <label htmlFor="address" className="form-label mb-8 h6">Designation</label>
                     <input type="text" className="form-control py-11" id="address" value={form.designation} onChange={(e) => { setForm({ ...form, designation: e.target.value }) }}
                         placeholder="Entrer une designation" />
                 </div>

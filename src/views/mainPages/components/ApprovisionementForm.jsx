@@ -5,7 +5,6 @@ function ApprovisionementForm({ hideForm }) {
     const [productData, setproductData] = useState([])
     const [supplierData, setsupplierData] = useState([])
     const [pourchase_form, setpourchase_form] = useState([]);
-    const [compte_data, setcompte_data] = useState([]);
     const [brut_total_price, setbrut_total_price] = useState(0);
 
     var now = new Date();
@@ -199,7 +198,7 @@ function ApprovisionementForm({ hideForm }) {
                             <form action="#">
                                 <div className="row gy-4">
                                     <div className="col-sm-6 col-xs-6">
-                                        <label htmlFor="fname" className="form-label mb-8 h6">Date de transaction</label>
+                                        <label htmlFor="fname" className="form-label mb-8 h6">Date de transaction <span className="text-danger">*</span></label>
                                         <input type="date" className="form-control py-11" id="fname" value={base_form.purchase_date} onChange={(e) => { setBaseForm({ ...base_form, purchase_date: e.target.value }) }}
                                             placeholder="Entrer une date" />
                                     </div>
@@ -209,7 +208,7 @@ function ApprovisionementForm({ hideForm }) {
                                             placeholder="Entrer une addresse" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label htmlFor="email" className="form-label mb-8 h6">Fournisseur</label>
+                                        <label htmlFor="email" className="form-label mb-8 h6">Fournisseur <span className="text-danger">*</span></label>
                                         <select id="" value={base_form.supplier_id} onChange={(e) => { setBaseForm({ ...base_form, supplier_id: e.target.value }) }} className="form-control py-11">
                                             <option hidden>Selectionnez un fournisseur</option>
                                             {supplierData.map((item, index) => (
@@ -229,9 +228,9 @@ function ApprovisionementForm({ hideForm }) {
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th style={{ width: '40%' }}>Produit</th>
-                                                        <th>Qté</th>
-                                                        <th>Prix Achat</th>
+                                                        <th style={{ width: '40%' }}>Produit <span className="text-danger">*</span></th>
+                                                        <th>Qté <span className="text-danger">*</span></th>
+                                                        <th>Prix Achat <span className="text-danger">*</span></th>
                                                         <th>P.T</th>
                                                         <th>Action</th>
                                                     </tr>

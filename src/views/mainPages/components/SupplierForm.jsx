@@ -99,7 +99,7 @@ function SupplierForm({ hideForm, singleSupplier }) {
             <div className="tab-content" id="pills-tabContent">
                 {/* My Details Tab start */}
                 <div className="tab-pane fade show active" id="pills-details" role="tabpanel"
-                    aria-labelledby="pills-details-tab" tabindex="0">
+                    aria-labelledby="pills-details-tab" tabIndex="0">
                     <div className="card mt-24">
                         <div className="card-header border-bottom">
                             <h4 className="mb-4">{form.id?"Modification du":"Nouveau"} Fournisseur</h4>
@@ -108,12 +108,12 @@ function SupplierForm({ hideForm, singleSupplier }) {
                             <form action="#">
                                 <div className="row gy-4">
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="fname" className="form-label mb-8 h6">Nom</label>
+                                        <label htmlFor="fname" className="form-label mb-8 h6">Nom <span className="text-danger">*</span></label>
                                         <input type="text" className="form-control py-11" id="fname" value={form.name} onChange={(e) => { setForm({ ...form, name: e.target.value }) }}
                                             placeholder="Entrer le nom" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="lname" className="form-label mb-8 h6">Genre</label>
+                                        <label htmlFor="lname" className="form-label mb-8 h6">Genre <span className="text-danger">*</span></label>
                                         <select className="form-control py-11" value={form.gender} onChange={(e) => { setForm({ ...form, gender: e.target.value }) }}>
                                             <option hidden>Selectionner une option</option>
                                             <option value="Masculin">Masculin</option>
@@ -121,12 +121,12 @@ function SupplierForm({ hideForm, singleSupplier }) {
                                         </select>
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="address" className="form-label mb-8 h6">Addresse</label>
+                                        <label htmlFor="address" className="form-label mb-8 h6">Addresse <span className="text-danger">*</span></label>
                                         <input type="text" className="form-control py-11" id="address" value={form.address} onChange={(e) => { setForm({ ...form, address: e.target.value }) }}
                                             placeholder="Entrer une addresse" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="telephone" className="form-label mb-8 h6">Telephone</label>
+                                        <label htmlFor="telephone" className="form-label mb-8 h6">Telephone <span className="text-danger">*</span></label>
                                         <PhoneInput
                                             country={"cd"}
                                             placeholder="Entrer un numero de telephone"
@@ -136,11 +136,11 @@ function SupplierForm({ hideForm, singleSupplier }) {
                                         />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="email" className="form-label mb-8 h6">Email</label>
+                                        <label htmlFor="email" className="form-label mb-8 h6">Email</label>
                                         <input type="email" className="form-control py-11" id="email" value={form.email} onChange={(e) => { setForm({ ...form, email: e.target.value }) }}
                                             placeholder="Entrer un email" />
                                     </div>
-                                    <div class="col-12">
+                                    <div className="col-12">
                                         <div className="flex-align justify-content-end gap-8">
                                             <button className="btn btn-outline-danger bg-danger-100 border-danger-100 text-danger-600 rounded-pill py-9" onClick={hideForm}>Annuler</button>
                                             <button type="button" className="btn btn-main rounded-pill py-9" onClick={submitData}>{form.id?"Modifier":"Enregistrer"}</button>

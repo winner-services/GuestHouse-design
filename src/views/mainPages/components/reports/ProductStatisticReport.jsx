@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from "react"
-import { MainContext } from "../../../config/MainContext";
 import { Dropdown } from 'react-bootstrap';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { MainContext } from "../../../../config/MainContext";
 
-function VenteViewmore({ hideForm, singleClient }) {
+function ProductStatisticReport({ hideForm, form }) {
     const [data, setData] = useState([])
     const { setLoader } = useContext(MainContext);
     const [deviseData, setDeviseData] = useState([]);
@@ -13,9 +13,10 @@ function VenteViewmore({ hideForm, singleClient }) {
     const getData = async () => {
         try {
             setLoader(true)
-            const response = await fetch(`${BaseUrl}/getDetailSale/${singleClient.sale_id}`, {
-                method: 'GET',
-                headers: headerRequest
+            const response = await fetch(`${BaseUrl}/getVenteProductStatisticReport`, {
+                method: 'POST',
+                headers: headerRequest,
+                body: JSON.stringify(form)
             });
             const res = await response.json();
             console.log("DATAs:", res.data)
@@ -70,7 +71,7 @@ function VenteViewmore({ hideForm, singleClient }) {
             logo.src = '/assets/images/logo.png'
             const pdf = new jsPDF();
             pdf.setProperties({
-                title: "Detail vente"
+                title: "Statistique des produits"
             })
 
             // Add images and text to the PDF
@@ -88,15 +89,7 @@ function VenteViewmore({ hideForm, singleClient }) {
 
             pdf.setFontSize(15);
             pdf.setFont('custom', 'bold');
-            pdf.text("DETAIL D'UNE VENTE", 76, 60);
-
-            pdf.setFontSize(10);
-            pdf.setFont('custom', 'normal');
-            pdf.text(`Date de transaction : ${formatDate(singleClient.sale_date)}`, 13, 70);
-            pdf.text(`Client : ${singleClient.name}`, 13, 75);
-            pdf.text(`Montant total : ${get_net_value(singleClient.total_price)}`, 13, 80);
-            pdf.text(`Montant paye : ${get_net_value(singleClient.paid_amount)}`, 13, 85);
-            pdf.text(`Montant restant : ${get_net_value(singleClient.total_price - singleClient.paid_amount)}`, 13, 90);
+            pdf.text("STATISTIQUE DES PRODUITS DU "+formatDate(form.date_start)+" AU "+formatDate(form.date_end), 30, 60);
 
             // Line width in units (you can adjust this)
             pdf.setLineWidth(0.1);
@@ -105,12 +98,14 @@ function VenteViewmore({ hideForm, singleClient }) {
             const itemDetailsRows = printData?.map((item, index) => [
                 (index + 1).toString(),
                 item.product.toString(),
-                item.quantity?.toString() + " " + item.unite?.toString(),
-                get_net_value(item.unite_price).toString(),
-                get_net_value(item.quantity * item.unite_price).toString(),
+                item.quantité_achetée?.toString() + " " + item.unite_designation?.toString(),
+                item.quantité_vendue?.toString() + " " + item.unite_designation?.toString(),
+                get_net_value(item.total_achat).toString(),
+                get_net_value(item.total_ventes).toString(),
+                get_net_value(item.total_ventes - item.total_achat).toString(),
             ]);
-            const itemDetailsHeaders = ['No', 'Produit', 'Qte', 'Prix Unitaire', 'Prix Total'];
-            const columnWidths = [15, 50, 35, 40, 40];
+            const itemDetailsHeaders = ['No', 'Produit', 'Qté Achetée', 'Qté Vendue', 'Prix Total Achat','Prix Total Vente','Benefice'];
+            const columnWidths = [15, 30, 25, 25, 30, 30, 30];
             // Define table styles
             const headerStyles = {
                 fillColor: [240, 240, 240],
@@ -119,7 +114,7 @@ function VenteViewmore({ hideForm, singleClient }) {
                 fontStyle: 'bold',
             };
             pdf.setFont('Newsreader');
-            const itemDetailsYStart = 97;
+            const itemDetailsYStart = 67;
             pdf.autoTable({
                 head: [itemDetailsHeaders],
                 body: itemDetailsRows,
@@ -139,6 +134,8 @@ function VenteViewmore({ hideForm, singleClient }) {
                     2: { cellWidth: columnWidths[2] },
                     3: { cellWidth: columnWidths[3] },
                     4: { cellWidth: columnWidths[4] },
+                    5: { cellWidth: columnWidths[5] },
+                    6: { cellWidth: columnWidths[6] },
                 },
                 alternateRowStyles: { fillColor: [255, 255, 255] },
                 bodyStyles: {
@@ -164,7 +161,7 @@ function VenteViewmore({ hideForm, singleClient }) {
             }
 
             // Save the PDF 
-            pdf.save(`Detail vente.pdf`);
+            pdf.save(`Statistique des produits.pdf`);
         } catch (error) {
             console.error("ERROR:", error);
             setLoader(false)
@@ -172,7 +169,6 @@ function VenteViewmore({ hideForm, singleClient }) {
     }
 
     useEffect(() => {
-        console.log("CLIENT:", singleClient)
         getData()
     }, [])
 
@@ -185,7 +181,7 @@ function VenteViewmore({ hideForm, singleClient }) {
                     <ul className="flex-align gap-4">
                         <li><a href="/main" className="text-gray-200 fw-normal text-15 hover-text-main-600">Accueil</a></li>
                         <li> <span className="text-gray-500 fw-normal d-flex"><i className="ph ph-caret-right"></i></span> </li>
-                        <li><a href="/main" className="text-gray-200 fw-normal text-15 hover-text-main-600">Ventes</a></li>
+                        <li><a href="/main" className="text-gray-200 fw-normal text-15 hover-text-main-600">Approvisionnements</a></li>
                         <li> <span className="text-gray-500 fw-normal d-flex"><i className="ph ph-caret-right"></i></span> </li>
                         <li><span className="text-main-600 fw-normal text-15">Details</span></li>
                     </ul>
@@ -220,17 +216,10 @@ function VenteViewmore({ hideForm, singleClient }) {
             <div className="tab-content" id="pills-tabContent">
                 {/* My Details Tab start */}
                 <div className="tab-pane fade show active" id="pills-details" role="tabpanel"
-                    aria-labelledby="pills-details-tab" tabIndex="0">
+                    aria-labelledby="pills-details-tab" tabindex="0">
                     <div className="card mt-24">
-                        <div className="card-header">
-                            <span>Date de transaction: {formatDate(singleClient.sale_date)}</span><br />
-                            <span>Client: {singleClient.customer}</span><br />
-                            <span>Montant total: {get_net_value(singleClient.total_price)}</span><br />
-                            <span>Montant paye: {get_net_value(singleClient.paid_amount)}</span><br />
-                            <span>Montant restant: {singleClient.total_price - singleClient.paid_amount} $</span><br />
-                        </div>
                         <div className="card-body">
-                            <h4 className="d-flex justify-content-center">DETAIL D'UNE VENTE</h4>
+                            <h4 className="d-flex justify-content-center">STATISTIQUE DES PRODUITS DU {formatDate(form.date_start)} AU {formatDate(form.date_end)}</h4>
                             <div className="card overflow-hidden">
                                 <div className="card-body overflow-x-auto">
                                     <table id="studentTable" className="table table-bordered table-striped">
@@ -238,9 +227,11 @@ function VenteViewmore({ hideForm, singleClient }) {
                                             <tr>
                                                 <th className="fixed-width"> #</th>
                                                 <th className="h6 text-gray-300">Produit</th>
-                                                <th className="h6 text-gray-300">Qte</th>
-                                                <th className="h6 text-gray-300">Prix Unitaire</th>
-                                                <th className="h6 text-gray-300">Prix Total</th>
+                                                <th className="h6 text-gray-300">Qté Achetée</th>
+                                                <th className="h6 text-gray-300">Qté Vendue</th>
+                                                <th className="h6 text-gray-300">Prix Total Achat</th>
+                                                <th className="h6 text-gray-300">Prix Total Vente</th>
+                                                <th className="h6 text-gray-300">Benefice</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -250,18 +241,31 @@ function VenteViewmore({ hideForm, singleClient }) {
                                                         <tr key={index}>
                                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.product}</span></td>
-                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity} {item.unite}</span></td>
-                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.unite_price)}</span></td>
-                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.quantity * item.unite_price)}</span></td>
+                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantité_achetée} {item.unite_designation}</span></td>
+                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantité_vendue} {item.unite_designation}</span></td>
+                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.total_achat)}</span></td>
+                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.total_ventes)}</span></td>
+                                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.total_ventes - item.total_achat)}</span></td>
                                                         </tr>
                                                     ))
                                                 ) : (<tr>
-                                                    <td colSpan={5}>
+                                                    <td colSpan={7}>
                                                         <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
                                                     </td>
                                                 </tr>)
-
                                             }
+                                            {/* {
+                                                data.length > 0 ?(
+                                                    <tr>
+                                                        <td colSpan={4}>
+                                                            <strong className="d-flex justify-content-center">TOTAL</strong>
+                                                        </td>
+                                                        <td><strong>{get_net_value(Object.values(data).reduce((prev, next)=>(Number(prev)+ Number(next["total_achat"])),0))}</strong></td>
+                                                        <td><strong>{get_net_value(Object.values(data).reduce((prev, next)=>(Number(prev)+ Number(next["total_ventes"])),0))}</strong></td>
+                                                        <td><strong>{get_net_value(Object.values(data).reduce((prev, next)=>(Number(prev)+ (Number(next["total_ventes"])- Number(next["total_achat"]))),0))}</strong></td>
+                                                    </tr>
+                                                ):null
+                                            } */}
                                         </tbody>
                                     </table>
                                 </div>
@@ -274,4 +278,4 @@ function VenteViewmore({ hideForm, singleClient }) {
     </>
 }
 
-export default VenteViewmore
+export default ProductStatisticReport

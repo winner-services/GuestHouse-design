@@ -138,6 +138,29 @@ function CommandKitchenPage() {
         }
     }
 
+    function formatDate(date, includeTime = false) {
+        const dateObj = new Date(date); // Convert to Date object if it's not already
+      
+        if (isNaN(dateObj)) {
+          return "Invalid Date"; // Handle invalid date inputs
+        }
+      
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+      
+        let formattedDate = `${day}/${month}/${year}`;
+      
+        if (includeTime) {
+          const hours = String(dateObj.getHours()).padStart(2, '0');
+          const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+          const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+          formattedDate += ` ${hours}:${minutes}:${seconds}`;
+        }
+      
+        return formattedDate;
+      }
+
     useEffect(() => {
         getPendingData()
         getActivatedData()
@@ -212,7 +235,7 @@ function CommandKitchenPage() {
                                                         pendingData.map((item, index) => (
                                                             <tr key={index}>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
-                                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.transaction_date}</span></td>
+                                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{formatDate(item.transaction_date)}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.product}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity} {item.unit}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.agent}</span></td>
@@ -266,7 +289,7 @@ function CommandKitchenPage() {
                                                         validatedData.map((item, index) => (
                                                             <tr key={index}>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
-                                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.transaction_date}</span></td>
+                                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{formatDate(item.transaction_date)}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.product}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity} {item.unit}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.agent}</span></td>
@@ -316,7 +339,7 @@ function CommandKitchenPage() {
                                                         rejectedData.map((item, index) => (
                                                             <tr key={index}>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
-                                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.transaction_date}</span></td>
+                                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{formatDate(item.transaction_date)}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.product}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity} {item.unit}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.agent}</span></td>

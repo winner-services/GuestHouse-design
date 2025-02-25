@@ -202,19 +202,19 @@ function DevisePage() {
             <Modal.Body>
                 <div className="row">
                     <div className="col-sm-6 col-xs-6">
-                        <label for="address" className="form-label mb-8 h6">Designation</label>
+                        <label htmlFor="address" className="form-label mb-8 h6">Designation</label>
                         <input type="text" className="form-control py-11" id="address" value={form.designation} onChange={(e) => { setForm({ ...form, designation: e.target.value }) }}
                             placeholder="Entrer une designation" />
                     </div>
                     <div className="col-sm-6 col-xs-6">
-                        <label for="address" className="form-label mb-8 h6">Symbole</label>
+                        <label htmlFor="address" className="form-label mb-8 h6">Symbole</label>
                         <input type="text" className="form-control py-11" id="address" value={form.symbol} onChange={(e) => { setForm({ ...form, symbol: e.target.value }) }}
                             placeholder="Entrer une Symbole" />
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-sm-6 col-xs-6">
-                        <label for="address" className="form-label mb-8 h6">Type de monnaie</label>
+                        <label htmlFor="address" className="form-label mb-8 h6">Type de monnaie</label>
                         <select className="form-control py-11" value={form.currency_type} onChange={(e) => { setForm({ ...form, currency_type: e.target.value }) }}>
                             <option hidden>Selectionner une option</option>
                             <option value="devise_principale">Devise principale</option>
@@ -222,14 +222,14 @@ function DevisePage() {
                         </select>
                     </div>
                     <div className="col-sm-6 col-xs-6">
-                        <label for="address" className="form-label mb-8 h6">Valeur de la monnaie</label>
+                        <label htmlFor="address" className="form-label mb-8 h6">Valeur de la monnaie</label>
                         <input type="number" className="form-control py-11" id="address" value={form.conversion_amount} onChange={(e) => { setForm({ ...form, conversion_amount: e.target.value }) }}
                             placeholder="Entrer une Valeur" />
                     </div>
                 </div>
                 
                 <div className="col-sm-12 col-xs-12">
-                    <label for="address" className="form-label mb-8 h6">Description</label>
+                    <label htmlFor="address" className="form-label mb-8 h6">Description</label>
                     <input type="text" className="form-control py-11" id="address" value={form.description} onChange={(e) => { setForm({ ...form, description: e.target.value }) }}
                         placeholder="Entrer une description" />
                 </div>

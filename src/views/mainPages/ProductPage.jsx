@@ -3,6 +3,8 @@ import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
 import ProductForm from "./components/ProductForm"
 import { Dropdown } from 'react-bootstrap';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 function ProductPage() {
     const [formVisible, seteFormVisible] = useState(false)
@@ -74,6 +76,120 @@ function ProductPage() {
         getData(pages);
     }
 
+    const downloadReport = async () => {
+        try {
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/getProductReport`, {
+                method: 'GET',
+                headers: headerRequest
+            });
+            const res = await response.json();
+            console.log("DATAs:", res.data)
+            if (res.data) {
+
+                const printData = res.data;
+                var logo = new Image()
+                logo.src = '/assets/images/logo.png'
+                const pdf = new jsPDF();
+                pdf.setProperties({
+                    title: "Liste des produits"
+                })
+
+                // Add images and text to the PDF
+                pdf.addImage(logo, 'png', 97, 3, 12, 20)
+                pdf.setFontSize(16);
+                pdf.setFont('custom', 'bold');
+                pdf.text('JOHN SERVICES MOTEL', 70, 27);
+                pdf.setFontSize(12);
+                pdf.setFont('custom', 'normal');
+                pdf.text('Q.les volcans, av.les messagers N° 13-B', 69, 32);
+                pdf.text('RCCM: 22-A-01622', 86, 37);
+                pdf.text('Impôt : A2315632S', 87, 42);
+                pdf.text('+243999023794', 90, 47);
+                pdf.text('johnservices@gmail.com', 83, 52);
+
+                pdf.setFontSize(15);
+                pdf.setFont('custom', 'bold');
+                pdf.text('LISTE DES PRODUITS', 77, 60);
+
+                pdf.setFontSize(10);
+                pdf.setFont('custom', 'bold');
+
+                // Line width in units (you can adjust this)
+                pdf.setLineWidth(0.1);
+
+                // Generate AutoTable for item details
+                const itemDetailsRows = printData?.map((item, index) => [
+                    (index + 1).toString(),
+                    item.designation.toString(),
+                    item.quantity+" "+item.unite_designation?.toString(),
+                    item.purchase_price+" $"?.toString(),
+                    item.selling_price+" $"?.toString(),
+                ]);
+                const itemDetailsHeaders = ['No', 'Designation', 'Quantite', 'Prix Achat', 'Prix Vente'];
+                const columnWidths = [15, 55, 30, 40, 45];
+                // Define table styles
+                const headerStyles = {
+                    fillColor: [240, 240, 240],
+                    textColor: [0],
+                    fontFamily: 'Newsreader',
+                    fontStyle: 'bold',
+                };
+                pdf.setFont('Newsreader');
+                const itemDetailsYStart = 65;
+                pdf.autoTable({
+                    head: [itemDetailsHeaders],
+                    body: itemDetailsRows,
+                    tableLineColor: 200,
+                    startY: itemDetailsYStart,
+                    headStyles: {
+                        fillColor: headerStyles.fillColor,
+                        textColor: headerStyles.textColor,
+                        fontStyle: headerStyles.fontStyle,
+                        fontSize: 10,
+                        font: 'Newsreader',
+                        halign: 'left',
+                    },
+                    columnStyles: {
+                        0: { cellWidth: columnWidths[0] },
+                        1: { cellWidth: columnWidths[1] },
+                        2: { cellWidth: columnWidths[2] },
+                        3: { cellWidth: columnWidths[3] },
+                        4: { cellWidth: columnWidths[4] },
+                    },
+                    alternateRowStyles: { fillColor: [255, 255, 255] },
+                    bodyStyles: {
+                        fontSize: 10,
+                        font: 'Newsreader',
+                        cellPadding: { top: 1, right: 5, bottom: 1, left: 2 },
+                        textColor: [0, 0, 0],
+                        rowPageBreak: 'avoid',
+                    },
+                    margin: { top: 10, left: 13 },
+                });
+
+                const totalPages = pdf.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.line(10, 283, 200, 283)
+                    pdf.setPage(i);
+                    pdf.setFont('Newsreader');
+                    pdf.text(
+                        `Page ${i} sur ${totalPages}`,
+                        185,
+                        pdf.internal.pageSize.getHeight() - 5
+                    );
+                }
+
+                // Save the PDF 
+                pdf.save(`Liste des produits.pdf`);
+            }
+            setLoader(false)
+        } catch (error) {
+            console.error("ERROR:", error);
+            setLoader(false)
+        }
+    }
+
     useEffect(() => {
         getData()
     }, [])
@@ -115,6 +231,7 @@ function ProductPage() {
                                     ))}
                                 </Dropdown.Menu>
                             </Dropdown>
+                            <button className="btn btn-success me-1" onClick={() => downloadReport()}>Telecharger</button>
                             <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Ajouter</button>
                         </div>
                     </div>

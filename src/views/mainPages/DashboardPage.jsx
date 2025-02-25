@@ -58,7 +58,7 @@ function DashboardPage() {
         exportEnabled: true,
         theme: "light2", //"light1", "dark1", "dark2"
         title: {
-            text: "Chambres les plus frequentees"
+            text: "Chambres les plus frequentées"
         },
         axisY: {
             includeZero: true
@@ -306,8 +306,8 @@ function DashboardPage() {
                                         <tr>
                                             <th>#</th>
                                             <th>Produit</th>
-                                            <th>Qte Minimal</th>
-                                            <th>Qte Restant</th>
+                                            <th>Qté Minimale</th>
+                                            <th>Qté Restante</th>
                                         </tr>
                                     </thead>
                                     <tbody>

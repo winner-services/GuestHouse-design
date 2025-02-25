@@ -1,3 +1,4 @@
+import AcquisitionFourniturePage from "../views/mainPages/AcquisitionFourniturePage";
 import AffectationChambre from "../views/mainPages/AffectationChambre";
 import ApprovisionementPage from "../views/mainPages/ApprovisionementPage";
 import ChambresPage from "../views/mainPages/ChambresPage";
@@ -11,7 +12,7 @@ import DevisePage from "../views/mainPages/DevisePage";
 import FournitureApprovisionementPage from "../views/mainPages/FournitureApprovisionementPage";
 import FourniturePage from "../views/mainPages/FourniturePage";
 import HistoriqueAffectationChambre from "../views/mainPages/HistoriqueAffectationChambre";
-import KitchenSupplyPage from "../views/mainPages/KitchenSupplyPage";
+import HistoriqueAffectationModifierChambre from "../views/mainPages/HistoriqueAffectationModifierChambre";
 import ProductPage from "../views/mainPages/ProductPage";
 import RapportPage from "../views/mainPages/RapportPage";
 import RestaurantSupplyPage from "../views/mainPages/RestaurantSupplyPage";
@@ -30,7 +31,6 @@ const mainRoutes = [
     {path:'suppliers', element:<SupplierPage />},
     {path:'pourchases', element:<ApprovisionementPage />},
     {path:'sortie-stock', element:<SortiStock />},
-    {path:'kitchen-supply', element:<KitchenSupplyPage />},
     {path:'comand-kitchen', element:<CommandKitchenPage />},
     {path:'restaurant-supply', element:<RestaurantSupplyPage />},
     {path:'departements', element:<DepartementPage />},
@@ -44,9 +44,11 @@ const mainRoutes = [
     {path:'devises', element:<DevisePage />},
     {path:'affectations-chambres', element:<AffectationChambre />},
     {path:'affectations-chambres-historique', element:<HistoriqueAffectationChambre />},
+    {path:'affectations-edited-chambres-historique', element:<HistoriqueAffectationModifierChambre />},
     {path:'rapports', element:<RapportPage />},
     {path:'fournitures', element:<FourniturePage />},
     {path:'fournitures-approvisionement', element:<FournitureApprovisionementPage />},
+    {path:'fournitures-acquisition', element:<AcquisitionFourniturePage />},
 ]
 
 export default mainRoutes

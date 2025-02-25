@@ -11,6 +11,7 @@ function CompteDepensesPage() {
     const { setLoader } = useContext(MainContext);
     const [form, setForm] = useState({
         designation: "",
+        transaction_type:"",
         description: ""
     })
 
@@ -83,7 +84,7 @@ function CompteDepensesPage() {
     }
 
     const modelUpdate = (model) => {
-        setForm({ designation: model.designation, description: model.description, id: model.id })
+        setForm({ designation: model.designation, description: model.description, transaction_type:model.transaction_type, id: model.id })
         seteFormVisible(true)
     }
 
@@ -145,6 +146,7 @@ function CompteDepensesPage() {
                             <tr>
                                 <th className="fixed-width"> #</th>
                                 <th className="h6 text-gray-300">Designation</th>
+                                <th className="h6 text-gray-300">Nature de compte</th>
                                 <th className="h6 text-gray-300">Description</th>
                                 <th className="h6 text-gray-300">Action</th>
                             </tr>
@@ -156,10 +158,13 @@ function CompteDepensesPage() {
                                         <tr key={index}>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.designation}</span></td>
+                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{item.transaction_type}</span></td>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.description}</span></td>
                                             <td>
-                                                <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
-                                                <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
+                                                {item.id >= 1 && item.id <= 6 ? null : <>
+                                                    <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
+                                                    <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
+                                                </>}
                                             </td>
                                         </tr>
                                     ))
@@ -185,9 +190,17 @@ function CompteDepensesPage() {
             </Modal.Header>
             <Modal.Body>
                 <div className="col-sm-12 col-xs-12">
-                    <label for="address" className="form-label mb-8 h6">Designation</label>
+                    <label for="address" className="form-label mb-8 h6">Designation <span className="text-danger">*</span></label>
                     <input type="text" className="form-control py-11" id="address" value={form.designation} onChange={(e) => { setForm({ ...form, designation: e.target.value }) }}
                         placeholder="Entrer une designation" />
+                </div>
+                <div className="col-sm-12 col-xs-12">
+                    <label for="lname" className="form-label mb-8 h6 me-1">Type de transaction <span className="text-danger">*</span></label>
+                    <select className="form-control py-11" value={form.transaction_type} onChange={(e) => { setForm({ ...form, transaction_type: e.target.value }) }}>
+                        <option hidden>Selectionner une option</option>
+                        <option value="RECETTE">Recette</option>
+                        <option value="DEPENSE">Depense</option>
+                    </select>
                 </div>
                 <div className="col-sm-12 col-xs-12">
                     <label for="address" className="form-label mb-8 h6">Description</label>

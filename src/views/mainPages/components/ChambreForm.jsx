@@ -175,7 +175,7 @@ function ChambreForm({ hideForm, singleClient }) {
             <div className="tab-content" id="pills-tabContent">
                 {/* My Details Tab start */}
                 <div className="tab-pane fade show active" id="pills-details" role="tabpanel"
-                    aria-labelledby="pills-details-tab" tabindex="0">
+                    aria-labelledby="pills-details-tab" tabIndex="0">
                     <div className="card mt-24">
                         <div className="card-header border-bottom">
                             <h4 className="mb-4">{form.id?'Modifier une ':'Nouvelle '} chambre</h4>
@@ -184,12 +184,12 @@ function ChambreForm({ hideForm, singleClient }) {
                             <form action="#">
                                 <div className="row gy-4">
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="fname" className="form-label mb-8 h6">Designation</label>
+                                        <label for="fname" className="form-label mb-8 h6">Designation <span className="text-danger">*</span></label>
                                         <input type="text" className="form-control py-11" id="fname" value={form.designation} onChange={(e) => { setForm({ ...form, designation: e.target.value }) }}
                                             placeholder="Entrer la designation" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="lname" className="form-label mb-8 h6 me-1">Categorie</label><button type="button" className="btn btn-secondary rounded-pill py-2" onClick={() => showCategModal()}>Ajouter +</button>
+                                        <label for="lname" className="form-label mb-8 h6 me-1">Categorie <span className="text-danger">*</span></label><button type="button" className="btn btn-secondary rounded-pill py-2" onClick={() => showCategModal()}>Ajouter +</button>
                                         <select className="form-control py-11" value={form.category_id} onChange={(e) => { setForm({ ...form, category_id: e.target.value }) }}>
                                             <option hidden>Selectionner une option</option>
                                             {categoryData.map((item, index) => (
@@ -198,12 +198,12 @@ function ChambreForm({ hideForm, singleClient }) {
                                         </select>
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="address" className="form-label mb-8 h6">Prix Nuité</label>
+                                        <label for="address" className="form-label mb-8 h6">Prix Nuité <span className="text-danger">*</span></label>
                                         <input type="number" className="form-control py-11" id="address" value={form.unite_price} onChange={(e) => { setForm({ ...form, unite_price: e.target.value }) }}
                                             placeholder="Entrer un Prix Nuité" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="lname" className="form-label mb-8 h6 me-1">Niveau</label><button type="button" className="btn btn-secondary rounded-pill py-2" onClick={() => showUnitModal()}>Ajouter +</button>
+                                        <label for="lname" className="form-label mb-8 h6 me-1">Niveau <span className="text-danger">*</span></label><button type="button" className="btn btn-secondary rounded-pill py-2" onClick={() => showUnitModal()}>Ajouter +</button>
                                         <select className="form-control py-11" value={form.level_id} onChange={(e) => { setForm({ ...form, level_id: e.target.value }) }}>
                                             <option hidden>Selectionner une option</option>
                                             {unitData.map((item, index) => (

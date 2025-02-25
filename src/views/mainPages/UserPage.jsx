@@ -76,7 +76,7 @@ function UserPage() {
                 const res = await response.json();
                 if (res.success) {
                     getData()
-                    Swal.fire(`${model.status=='Validated'?'Validée':'Rejetée'}`, `Une commande a été ${model.status=='Validated'?'Validée':'Rejetée'}`, 'success')
+                    Swal.fire(`${model.status=='Validated'?'Validé':'Suspendu'}`, `Un utilisateur a été ${model.status=='Validated'?'Validé':'Suspendu'}`, 'success')
                 }
                 setLoader(false)
             } else {
@@ -161,9 +161,9 @@ function UserPage() {
                                                 {item.active==1?<span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Activé</span>:''}
                                             </td>
                                             <td>
-                                                <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
-                                                <button className="btn btn-success p-9 me-1" onClick={() => modalValidateUser({id:item.id, status:"Validated"})}><i className="ph ph-user-check text-white"></i></button>
-                                                <button className="btn btn-danger p-9" onClick={() => modalValidateUser({id:item.id, status:"Rejected"})}><i className="ph ph-trash text-white"></i></button>
+                                                <button className="btn btn-main p-9 me-1" title="Modifier l'utilisateur" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
+                                                <button className="btn btn-success p-9 me-1" title="Activer l'utilisateur" onClick={() => modalValidateUser({id:item.id, status:"Validated"})}><i className="ph ph-user-check text-white"></i></button>
+                                                <button className="btn btn-warning p-9" title="Desactiver l'utilisateur" onClick={() => modalValidateUser({id:item.id, status:"Rejected"})}><i className="ph ph-user-minus text-white"></i></button>
                                             </td>
                                         </tr>
                                     ))

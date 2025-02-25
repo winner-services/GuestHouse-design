@@ -9,14 +9,19 @@ function UserForm({ hideForm, singleClient }) {
         phone: "",
         address: "",
         email: "",
-        password:"",
-        role_id:null,
-        service_id:null
+        password: "",
+        role_id: null,
+        service_id: null
     })
 
     const { setLoader } = useContext(MainContext);
     const [roleData, setRoleData] = useState([])
     const [serviceData, setServiceData] = useState([])
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
 
     const submitData = async (e) => {
         e.preventDefault()
@@ -144,7 +149,7 @@ function UserForm({ hideForm, singleClient }) {
             <div className="tab-content" id="pills-tabContent">
                 {/* My Details Tab start */}
                 <div className="tab-pane fade show active" id="pills-details" role="tabpanel"
-                    aria-labelledby="pills-details-tab" tabindex="0">
+                    aria-labelledby="pills-details-tab" tabIndex="0">
                     <div className="card mt-24">
                         <div className="card-header border-bottom">
                             <h4 className="mb-4">Nouvel utilisateur</h4>
@@ -153,12 +158,12 @@ function UserForm({ hideForm, singleClient }) {
                             <form action="#">
                                 <div className="row gy-4">
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="fname" className="form-label mb-8 h6">Nom</label>
+                                        <label htmlFor="fname" className="form-label mb-8 h6">Nom <span className="text-danger">*</span></label>
                                         <input type="text" className="form-control py-11" id="fname" value={form.name} onChange={(e) => { setForm({ ...form, name: e.target.value }) }}
                                             placeholder="Entrer le nom" />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="lname" className="form-label mb-8 h6">Genre</label>
+                                        <label htmlFor="lname" className="form-label mb-8 h6">Genre <span className="text-danger">*</span></label>
                                         <select className="form-control py-11" value={form.gender} onChange={(e) => { setForm({ ...form, gender: e.target.value }) }}>
                                             <option hidden>Selectionner une option</option>
                                             <option value="Masculin">Masculin</option>
@@ -166,12 +171,12 @@ function UserForm({ hideForm, singleClient }) {
                                         </select>
                                     </div>
                                     {/* <div className="col-sm-6 col-xs-6">
-                                        <label for="address" className="form-label mb-8 h6">Addresse</label>
+                                        <label htmlFor="address" className="form-label mb-8 h6">Addresse</label>
                                         <input type="text" className="form-control py-11" id="address" value={form.address} onChange={(e) => { setForm({ ...form, address: e.target.value }) }}
                                             placeholder="Entrer une addresse" />
                                     </div> */}
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="telephone" className="form-label mb-8 h6">Telephone</label>
+                                        <label htmlFor="telephone" className="form-label mb-8 h6">Telephone <span className="text-danger">*</span></label>
                                         <PhoneInput
                                             country={"cd"}
                                             placeholder="Entrer un numero de telephone"
@@ -181,7 +186,7 @@ function UserForm({ hideForm, singleClient }) {
                                         />
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="lname" className="form-label mb-8 h6 me-1">Role</label>
+                                        <label htmlFor="lname" className="form-label mb-8 h6 me-1">Role <span className="text-danger">*</span></label>
                                         <select className="form-control py-11" value={form.role_id} onChange={(e) => { setForm({ ...form, role_id: e.target.value }) }}>
                                             <option hidden>Selectionner une option</option>
                                             {roleData.map((item, index) => (
@@ -190,17 +195,28 @@ function UserForm({ hideForm, singleClient }) {
                                         </select>
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="email" className="form-label mb-8 h6">Email</label>
+                                        <label htmlFor="email" className="form-label mb-8 h6">Email <span className="text-danger">*</span></label>
                                         <input type="email" className="form-control py-11" id="email" value={form.email} onChange={(e) => { setForm({ ...form, email: e.target.value }) }}
                                             placeholder="Entrer un email" />
                                     </div>
+                                    {/* <div className="col-sm-6 col-xs-6">
+                                        <label htmlFor="current-password" className="form-label mb-8 h6">Mot de passe <span className="text-danger">*</span></label>
+                                        <div className="position-relative">
+                                            <input type="password" className="form-control py-11" id="current-password" value={form.password} onChange={(e) => { setForm({ ...form, password: e.target.value }) }}
+                                                placeholder="Entrer un mot de passe" />
+                                            <span className="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y ph ph-eye-slash" id="#current-password"></span>
+                                            <span className="position-absolute top-50 translate-middle-y ms-16 text-gray-600 d-flex"><i className="ph ph-lock"></i></span>
+                                        </div>
+                                    </div> */}
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="email" className="form-label mb-8 h6">Mot de passe</label>
-                                        <input type="password" className="form-control py-11" id="email" value={form.password} onChange={(e) => { setForm({ ...form, password: e.target.value }) }}
-                                            placeholder="Entrer un mot de passe" />
+                                        <label for="current-password" className="form-label mb-8 h6">Mot de passe <span className="text-danger">*</span></label>
+                                        <div className="position-relative">
+                                            <input type={showPassword ? 'text' : 'password'} className="form-control py-11" onChange={(e) => { setForm({ ...form, password: e.target.value }) }} id="current-password" placeholder="Entrer votre mot de passe" />
+                                            <span className="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y ph ph-eye-slash" id="#current-password" onClick={togglePasswordVisibility}></span>
+                                        </div>
                                     </div>
                                     <div className="col-sm-6 col-xs-6">
-                                        <label for="lname" className="form-label mb-8 h6 me-1">Service</label>
+                                        <label htmlFor="lname" className="form-label mb-8 h6 me-1">Service <span className="text-danger">*</span></label>
                                         <select className="form-control py-11" value={form.service_id} onChange={(e) => { setForm({ ...form, service_id: e.target.value }) }}>
                                             <option hidden>Selectionner une option</option>
                                             {serviceData.map((item, index) => (
@@ -208,7 +224,7 @@ function UserForm({ hideForm, singleClient }) {
                                             ))}
                                         </select>
                                     </div>
-                                    <div class="col-12">
+                                    <div className="col-12">
                                         <div className="flex-align justify-content-end gap-8">
                                             <button className="btn btn-outline-danger bg-danger-100 border-danger-100 text-danger-600 rounded-pill py-9" onClick={hideForm}>Annuler</button>
                                             <button type="button" className="btn btn-main rounded-pill py-9" onClick={submitData}>Enregistrer</button>

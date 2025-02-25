@@ -1,35 +1,32 @@
 import { useContext, useEffect, useState } from "react"
-import ClientForm from "./components/ClientForm"
 import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
-import ClientViewmore from "./components/ClientViewmore"
+import SupplierForm from "./components/SupplierForm"
 
-function ClientPage() {
-    const [formVisible, setFormVisible] = useState(false)
-    const [viewmoreVisible, setViewmoreVisible] = useState(false)
-    const [singleClient, setSingleClient] = useState({})
+function HistoriqueAffectationModifierChambre() {
+    const [formVisible, seteFormVisible] = useState(false)
+    const [singleSupplier, setsingleSupplier] = useState({})
     const [data, setData] = useState([])
     const [entries, setEntries] = useState([])
     const { setLoader } = useContext(MainContext);
 
     const hideForm = () => {
-        setFormVisible(false)
-        setViewmoreVisible(false)
+        seteFormVisible(false)
         getData();
-        Object.keys(singleClient).forEach(function (key, index) {
-            delete singleClient[key];
+        Object.keys(singleSupplier).forEach(function (key, index) {
+            delete singleSupplier[key];
         });
     }
 
     const getData = async (page = 1, q = '') => {
         try {
             setLoader(true)
-            const response = await fetch(`${BaseUrl}/getCustomerData?page=${page}&q=${q}`, {
+            const response = await fetch(`${BaseUrl}/getFraudData?page=${page}&q=${q}`, {
                 method: 'GET',
                 headers: headerRequest
             });
             const res = await response.json();
-            console.log("CLIENT DATA:", res.data)
+            console.log("DATAs:", res.data)
             if (res.data) {
                 setData(res.data.data);
                 setEntries(res.data);
@@ -42,23 +39,41 @@ function ClientPage() {
     }
 
     const modelUpdate = (model) => {
-        setSingleClient(model)
-        setFormVisible(true)
-    }
-
-    const modelViewMore = (model) => {
-        setSingleClient(model)
-        setViewmoreVisible(true)
+        setsingleSupplier(model)
+        seteFormVisible(true)
     }
 
     const searchDataFn = (searchData) => {
         if (searchData) {
             let term = searchData.toLowerCase();
-            getData(1, term);
+            getData(1,term);
         } else {
             getData();
         }
     };
+
+    function formatDate(date, includeTime = false) {
+        const dateObj = new Date(date); // Convert to Date object if it's not already
+      
+        if (isNaN(dateObj)) {
+          return "Invalid Date"; // Handle invalid date inputs
+        }
+      
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+      
+        let formattedDate = `${day}/${month}/${year}`;
+      
+        if (includeTime) {
+          const hours = String(dateObj.getHours()).padStart(2, '0');
+          const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+          const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+          formattedDate += ` ${hours}:${minutes}:${seconds}`;
+        }
+      
+        return formattedDate;
+      }
 
     const getResult = (pages) => {
 
@@ -73,7 +88,7 @@ function ClientPage() {
     }, [])
 
 
-    if (formVisible == false && viewmoreVisible == false) {
+    if (formVisible == false) {
         return <>
             <div className="dashboard-body">
 
@@ -84,7 +99,7 @@ function ClientPage() {
                             <li><a href="/main" className="text-gray-200 fw-normal text-15 hover-text-main-600">Accueil</a>
                             </li>
                             <li> <span className="text-gray-500 fw-normal d-flex"><i className="ph ph-caret-right"></i></span> </li>
-                            <li><span className="text-main-600 fw-normal text-15">Clients</span></li>
+                            <li><span className="text-main-600 fw-normal text-15">Historique des affectations modifiées</span></li>
                         </ul>
                     </div>
                     {/* Breadcrumb End */}
@@ -93,10 +108,6 @@ function ClientPage() {
                     <div className="flex-align gap-8 flex-wrap">
                         <div className="position-relative text-gray-500 flex-align gap-4 text-13">
                             <input type="text" className="form-control" placeholder="Chercher..." onChange={(e) => { searchDataFn(e.target.value) }} />
-                        </div>
-                        <div
-                            className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
-                            <button className="btn btn-primary" onClick={() => setFormVisible(true)}>Ajouter</button>
                         </div>
                     </div>
                     {/* Breadcrumb Right End */}
@@ -109,14 +120,15 @@ function ClientPage() {
                             <thead>
                                 <tr>
                                     <th className="fixed-width"> #</th>
-                                    <th className="h6 text-gray-300">Nom</th>
-                                    <th className="h6 text-gray-300">Genre</th>
-                                    <th className="h6 text-gray-300">Addresse</th>
-                                    <th className="h6 text-gray-300">Telephone</th>
-                                    <th className="h6 text-gray-300">Pièce Identité</th>
-                                    <th className="h6 text-gray-300">Numéro pièce</th>
-                                    <th className="h6 text-gray-300">Email</th>
-                                    <th className="h6 text-gray-300">Actions</th>
+                                    <th className="h6 text-gray-300">Reference</th>
+                                    <th className="h6 text-gray-300">Date</th>
+                                    <th className="h6 text-gray-300">Client</th>
+                                    <th className="h6 text-gray-300">Chambre</th>
+                                    <th className="h6 text-gray-300">Nombre des jours</th>
+                                    <th className="h6 text-gray-300">Prix Unitaire</th>
+                                    <th className="h6 text-gray-300">Prix Total</th>
+                                    <th className="h6 text-gray-300">Montant payé</th>
+                                    <th className="h6 text-gray-300">Reduction</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -125,22 +137,19 @@ function ClientPage() {
                                         data.map((item, index) => (
                                             <tr key={index}>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{index + 1}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.name}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.gender == "Masculin" ? 'Masculin' : 'Féminin'}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.address}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.phone}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.identity_document}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.part_number}</span></td>
-                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.email}</span></td>
-                                                <td>
-                                                    <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
-                                                    <button className="btn btn-info p-9 me-1" onClick={() => modelViewMore(item)}><i className="ph ph-file-text text-white"></i></button>
-                                                    <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
-                                                </td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.reference}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">Du {formatDate(item.start_date)} au {formatDate(item.end_date)}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.customer}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.room}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.nombre_nuite} Jours</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.unite_price} $</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.total_amount} $</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.paid_amount} $</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{item.reduction} $</span></td>
                                             </tr>
                                         ))
                                     ) : (<tr>
-                                        <td colSpan={7}>
+                                        <td colSpan={10}>
                                             <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
                                         </td>
                                     </tr>)
@@ -149,19 +158,17 @@ function ClientPage() {
                             </tbody>
                         </table>
                     </div>
-                    <div className="pagination mt-3 mb-8">
+                    <div className="paginate mt-3 mb-8">
                         <Pagination data={entries} limit={2} onPageChange={getResult} />
                     </div>
                 </div>
 
             </div>
         </>
-    } else if (formVisible == true && viewmoreVisible == false) {
-        return <ClientForm hideForm={hideForm} singleClient={singleClient} />
-    } else if (formVisible == false && viewmoreVisible == true) {
-        return <ClientViewmore hideForm={hideForm} singleClient={singleClient} />
+    } else {
+        return <SupplierForm hideForm={hideForm} singleSupplier={singleSupplier} />
     }
 
 }
 
-export default ClientPage
+export default HistoriqueAffectationModifierChambre

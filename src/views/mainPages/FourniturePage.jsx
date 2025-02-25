@@ -3,6 +3,8 @@ import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
 import Modal from 'react-bootstrap/Modal';
 import { Dropdown } from 'react-bootstrap';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 function FourniturePage() {
     const [formVisible, seteFormVisible] = useState(false)
@@ -124,6 +126,118 @@ function FourniturePage() {
         return `${result} ${deviseValue.symbol}`
     }
 
+    const downloadReport = async () => {
+            try {
+                setLoader(true)
+                const response = await fetch(`${BaseUrl}/getFournitureReport`, {
+                    method: 'GET',
+                    headers: headerRequest
+                });
+                const res = await response.json();
+                console.log("DATAs:", res.data)
+                if (res.data) {
+    
+                    const printData = res.data;
+                    var logo = new Image()
+                    logo.src = '/assets/images/logo.png'
+                    const pdf = new jsPDF();
+                    pdf.setProperties({
+                        title: "Liste des fournitures"
+                    })
+    
+                    // Add images and text to the PDF
+                    pdf.addImage(logo, 'png', 97, 3, 12, 20)
+                    pdf.setFontSize(16);
+                    pdf.setFont('custom', 'bold');
+                    pdf.text('JOHN SERVICES MOTEL', 70, 27);
+                    pdf.setFontSize(12);
+                    pdf.setFont('custom', 'normal');
+                    pdf.text('Q.les volcans, av.les messagers N° 13-B', 69, 32);
+                    pdf.text('RCCM: 22-A-01622', 86, 37);
+                    pdf.text('Impôt : A2315632S', 87, 42);
+                    pdf.text('+243999023794', 90, 47);
+                    pdf.text('johnservices@gmail.com', 83, 52);
+    
+                    pdf.setFontSize(15);
+                    pdf.setFont('custom', 'bold');
+                    pdf.text('LISTE DES FOURNITURES', 73, 60);
+    
+                    pdf.setFontSize(10);
+                    pdf.setFont('custom', 'bold');
+    
+                    // Line width in units (you can adjust this)
+                    pdf.setLineWidth(0.1);
+    
+                    // Generate AutoTable for item details
+                    const itemDetailsRows = printData?.map((item, index) => [
+                        (index + 1).toString(),
+                        item.designation.toString(),
+                        item.quantity?.toString(),
+                        get_net_value(item.value)?.toString()
+                    ]);
+                    const itemDetailsHeaders = ['No', 'Designation', 'Quantite', 'Valeur'];
+                    const columnWidths = [15, 65, 50, 50];
+                    // Define table styles
+                    const headerStyles = {
+                        fillColor: [240, 240, 240],
+                        textColor: [0],
+                        fontFamily: 'Newsreader',
+                        fontStyle: 'bold',
+                    };
+                    pdf.setFont('Newsreader');
+                    const itemDetailsYStart = 65;
+                    pdf.autoTable({
+                        head: [itemDetailsHeaders],
+                        body: itemDetailsRows,
+                        tableLineColor: 200,
+                        startY: itemDetailsYStart,
+                        headStyles: {
+                            fillColor: headerStyles.fillColor,
+                            textColor: headerStyles.textColor,
+                            fontStyle: headerStyles.fontStyle,
+                            fontSize: 10,
+                            font: 'Newsreader',
+                            halign: 'left',
+                        },
+                        columnStyles: {
+                            0: { cellWidth: columnWidths[0] },
+                            1: { cellWidth: columnWidths[1] },
+                            2: { cellWidth: columnWidths[2] },
+                            3: { cellWidth: columnWidths[3] },
+                        },
+                        alternateRowStyles: { fillColor: [255, 255, 255] },
+                        bodyStyles: {
+                            fontSize: 10,
+                            font: 'Newsreader',
+                            cellPadding: { top: 1, right: 5, bottom: 1, left: 2 },
+                            textColor: [0, 0, 0],
+                            rowPageBreak: 'avoid',
+                        },
+                        margin: { top: 10, left: 13 },
+                    });
+    
+                    const totalPages = pdf.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                        pdf.line(10, 283, 200, 283)
+                        pdf.setPage(i);
+                        pdf.setFont('Newsreader');
+                        pdf.text(
+                            `Page ${i} sur ${totalPages}`,
+                            185,
+                            pdf.internal.pageSize.getHeight() - 5
+                        );
+                    }
+    
+                    // Save the PDF 
+                    pdf.save(`Liste des fournitures.pdf`);
+                }
+                setLoader(false)
+            } catch (error) {
+                console.error("ERROR:", error);
+                setLoader(false)
+            }
+        }
+
     useEffect(() => {
         getData()
     }, [])
@@ -163,6 +277,7 @@ function FourniturePage() {
                                 ))}
                             </Dropdown.Menu>
                         </Dropdown>
+                        <button className="btn btn-success me-1" onClick={() => downloadReport()}>Telecharger</button>
                         <button className="btn btn-primary" onClick={() => seteFormVisible(true)}>Ajouter</button>
                     </div>
                 </div>
@@ -219,17 +334,17 @@ function FourniturePage() {
             </Modal.Header>
             <Modal.Body>
                 <div className="col-sm-12 col-xs-12">
-                    <label for="address" className="form-label mb-8 h6">Designation</label>
+                    <label htmlFor="address" className="form-label mb-8 h6">Designation <span className="text-danger">*</span></label>
                     <input type="text" className="form-control py-11" id="address" value={form.designation} onChange={(e) => { setForm({ ...form, designation: e.target.value }) }}
                         placeholder="Entrer une designation" />
                 </div>
                 <div className="col-sm-12 col-xs-12 mt-3">
-                    <label for="qty" className="form-label mb-8 h6">Quantite</label>
+                    <label htmlFor="qty" className="form-label mb-8 h6">Quantite</label>
                     <input type="number" className="form-control py-11" id="qty" value={form.quantity} onChange={(e) => { setForm({ ...form, quantity: e.target.value }) }}
                         placeholder="Entrer une quantite" />
                 </div>
                 <div className="col-sm-12 col-xs-12 mt-3">
-                    <label for="value" className="form-label mb-8 h6">Valeur</label>
+                    <label htmlFor="value" className="form-label mb-8 h6">Valeur <span className="text-danger">*</span></label>
                     <input type="number" className="form-control py-11" id="value" value={form.value} onChange={(e) => { setForm({ ...form, value: e.target.value }) }}
                         placeholder="Entrer une valeur" />
                 </div>

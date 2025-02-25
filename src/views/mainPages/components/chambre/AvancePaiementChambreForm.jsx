@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../../../config/MainContext";
 
-function AttributionChambreForm({ hideForm, singleRoom }) {
-    const [clientData, setclientData] = useState([])
+function AvancePaiementChambreForm({hideForm, singleRoom}) {
+    const [affectationData, setAffectationData] = useState({})
     const { setLoader } = useContext(MainContext);
     var now = new Date();
     var month = (now.getMonth() + 1);
@@ -13,36 +13,32 @@ function AttributionChambreForm({ hideForm, singleRoom }) {
         day = "0" + day;
     var today = now.getFullYear() + '-' + month + '-' + day;
     const [form, setForm] = useState({
-        customer_id: "",
-        room_id: singleRoom.id,
-        paid_amount: 0,
-        start_date: today,
-        end_date: today,
-        index: 2
+        transaction_date:today,
+        paid_amount:0,
+        index:5
     })
 
     function formatDate(isoString) {
         // Create a Date object from the ISO string
         const date = new Date(isoString);
-
+      
         // Extract individual components
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
-        const
-            hours = String(date.getHours()).padStart(2, '0');
+        const  
+       hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2,
-            '0');
-
+        const seconds = String(date.getSeconds()).padStart(2,  
+       '0');
+      
         // Construct the desired format
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
 
-    const handleDownloadPDF = (reference) => {
+    const handleDownloadPDF = (reference, client) => {
         const logoImage = new Image();
         logoImage.src = "/assets/images/logo.png";
-        const client = clientData.find((item) => item.id == form.id)
         logoImage.onload = () => {
             // Open the print window
             const WinPrint = window.open("", "facture", "");
@@ -120,7 +116,7 @@ function AttributionChambreForm({ hideForm, singleRoom }) {
                         Impôt : A2315632S<br>
                         +243999023794<br>
                         johnservices@gmail.com<br>
-                        <span>Date: ${formatDate(today)} ${now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds()}</span>
+                        <span>Date: ${formatDate(today)} ${now.getHours()+":"+now.getMinutes()+":"+now.getSeconds()}</span>
                         <h2>FACTURE No: ${reference}</h2>
                     </div>
 
@@ -171,12 +167,13 @@ function AttributionChambreForm({ hideForm, singleRoom }) {
 
     const submitData = async () => {
 
-        let url = `createAssignment`
+        let url = `advancePayment`
         let method = 'POST'
 
         setLoader(true)
         form.start_date = formatDate(form.start_date)
         form.end_date = formatDate(form.end_date)
+        form.affectation_id = affectationData.id
         try {
 
             const response = await fetch(`${BaseUrl}/${url}`, {
@@ -186,14 +183,12 @@ function AttributionChambreForm({ hideForm, singleRoom }) {
             });
             const res = await response.json();
             if (res.success) {
-                toastr.success("Une chambre a ete attribue avec success", "Success");
+                toastr.success("Un piement a ete effectue avec success", "Success");
                 hideForm(false)
                 // Object.keys(form).forEach(function (key, index) {
                 //     delete form[key];
                 // });
-                if (form.paid_amount > 0) {
-                    handleDownloadPDF(res.reference, res.client)
-                }
+                handleDownloadPDF(res.reference, res.client)
                 setLoader(false)
             } else {
                 toastr.error("Veillez reessayez", "Erreur");
@@ -208,17 +203,17 @@ function AttributionChambreForm({ hideForm, singleRoom }) {
         }
     }
 
-    const getClientOptions = async () => {
+    const getAffectationOptions = async () => {
         try {
             setLoader(true)
-            const response = await fetch(`${BaseUrl}/getCustomerOptions`, {
+            const response = await fetch(`${BaseUrl}/getAffectationByRoomId/${singleRoom.id}`, {
                 method: 'GET',
                 headers: headerRequest
             });
             const res = await response.json();
-            console.log("DATAs:", res.data)
+            console.log("AFFECTATION:", res.data)
             if (res.data) {
-                setclientData(res.data);
+                setAffectationData(res.data);
             }
             setLoader(false)
         } catch (error) {
@@ -228,46 +223,32 @@ function AttributionChambreForm({ hideForm, singleRoom }) {
     }
 
 
-    useEffect(() => {
-        getClientOptions()
-    }, [])
+    useEffect(()=>{
+        getAffectationOptions()
+    },[])
 
     return <>
         <div className="row">
-            <h4>Attribuer la chambre</h4>
+            <h4>Avance du paiement de la chambre</h4>
+            <div className="col-sm-12 col-xs-12 mb-8">
+                <label htmlFor="fname" className="form-label mb-8 h6">Date de l'operation</label>
+                <input type="date" className="form-control py-11" id="fname" value={form.transaction_date} onChange={(e) => { setForm({ ...form, transaction_date: e.target.value }) }}
+                    placeholder="Entrer une date" />
+            </div>
             <div className="col-sm-12 col-xs-12 mb-8">
                 <label htmlFor="fname" className="form-label mb-8 h6">Montant payé</label>
                 <input type="number" className="form-control py-11" id="fname" value={form.paid_amount} onChange={(e) => { setForm({ ...form, paid_amount: e.target.value }) }}
                     placeholder="Entrer un montant" />
-            </div>
-            <div className="col-sm-12 col-xs-12 mb-8">
-                <label htmlFor="email" className="form-label mb-8 h6">Client</label>
-                <select id="" value={form.customer_id} onChange={(e) => { setForm({ ...form, customer_id: e.target.value }) }} className="form-control py-11">
-                    <option hidden>Selectionnez un client</option>
-                    {clientData.map((item, index) => (
-                        <option value={item.id} key={index}>{item.name}</option>
-                    ))}
-                </select>
-            </div>
-            <div className="col-sm-6 col-xs-6 mb-8">
-                <label htmlFor="fname" className="form-label mb-8 h6">Date debut</label>
-                <input type="datetime-local" className="form-control py-11" id="fname" value={form.start_date} onChange={(e) => { setForm({ ...form, start_date: e.target.value }) }}
-                    placeholder="Entrer une date" />
-            </div>
-            <div className="col-sm-6 col-xs-6 mb-8">
-                <label htmlFor="fname" className="form-label mb-8 h6">Date de fin</label>
-                <input type="datetime-local" className="form-control py-11" id="fname" value={form.end_date} onChange={(e) => { setForm({ ...form, end_date: e.target.value }) }}
-                    placeholder="Entrer une date" />
             </div>
 
             <div className="col-sm-12">
                 <button className="btn btn-outline-danger bg-danger-100 border-danger-100 text-danger-600 rounded-pill py-9 me-1" onClick={hideForm}>Annuler</button>
                 <button type="button" className="btn btn-main rounded-pill py-9" onClick={submitData}>Enregistrer</button>
             </div>
-
+            
         </div>
 
     </>
 }
 
-export default AttributionChambreForm
+export default AvancePaiementChambreForm

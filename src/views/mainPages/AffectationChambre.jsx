@@ -6,6 +6,7 @@ import ReservationChambreForm from "./components/chambre/ReservationChambreForm"
 import TransfertChambreForm from "./components/chambre/TransfertChambreForm";
 import ClotureChambre from "./components/chambre/ClotureChambre";
 import { Dropdown } from 'react-bootstrap';
+import AvancePaiementChambreForm from "./components/chambre/AvancePaiementChambreForm";
 
 function AffectationChambre() {
     const [formVisible, setFormVisible] = useState(false)
@@ -185,6 +186,7 @@ function AffectationChambre() {
                                 <li className="list-group-item"><a href="#" onClick={() => setRoomOps(2)}>Reserver la chambre</a></li>
                             </> : null}
                             {singleChambre.status == 'Occupée' ? <>
+                                <li className="list-group-item"><a href="#" onClick={() => setRoomOps(5)}>Avance sur le paiement</a></li>
                                 <li className="list-group-item"><a href="#" onClick={() => setRoomOps(3)}>Transferer le client</a></li>
                                 <li className="list-group-item"><a href="#" onClick={() => setRoomOps(4)}>Cloturer le sejour du client</a></li>
                             </> : null}
@@ -205,7 +207,10 @@ function AffectationChambre() {
                             ) : room_operation == 4 ?
                                 (
                                     <ClotureChambre hideForm={hideAllForms} singleRoom={singleChambre} />
-                                ) : ''}
+                                ) : room_operation == 5 ?
+                                (
+                                    <AvancePaiementChambreForm hideForm={hideAllForms} singleRoom={singleChambre} />
+                                ): null}
 
             </Modal.Body>
         </Modal>
