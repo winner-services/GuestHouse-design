@@ -3,6 +3,8 @@ import { MainContext } from "../../../../config/MainContext";
 
 function AvancePaiementChambreForm({hideForm, singleRoom}) {
     const [affectationData, setAffectationData] = useState({})
+    const [transasctionData, setTransactionData] = useState([])
+    const [detteData, setDetteData] = useState([])
     const { setLoader } = useContext(MainContext);
     var now = new Date();
     var month = (now.getMonth() + 1);
@@ -34,6 +36,20 @@ function AvancePaiementChambreForm({hideForm, singleRoom}) {
       
         // Construct the desired format
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    function getDaysBetweenDates(startDateString, endDateString) {
+        // Convert strings to Date objects
+        const startDate = new Date(startDateString);
+        const endDate = new Date(endDateString);
+
+        // Calculate the difference in  milliseconds
+        const timeDiff = endDate - startDate;
+
+        // Convert milliseconds to days
+        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+        return daysDiff==0?1:daysDiff;
     }
 
     const handleDownloadPDF = (reference, client) => {
@@ -131,24 +147,36 @@ function AvancePaiementChambreForm({hideForm, singleRoom}) {
                         <tr>
                             <th>#</th>
                             <th>Chambre</th>
-                            <th>Montant</th>
-                            <th>Obs.</th>
+                            <th>Qté</th>
+                            <th>P.U</th>
+                            <th>P.T</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>${singleRoom.designation} - ${singleRoom.categorie}</td>
-                            <td>${form.paid_amount} $</td>
-                            <td></td>
+                            <tr>
+                                <td>1</td>
+                                <td>${singleRoom.designation} - ${singleRoom.categorie}</td>
+                                <td>${getDaysBetweenDates(affectationData.start_date, affectationData.end_date)} Jours</td>
+                                <td>${singleRoom.unite_price} $</td>
+                                <td>${getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)} $</td>
                             </tr>
                         </tbody>
                         <tfoot>
-                        <tr>
-                            <td colspan="2" class="total">TOTAL:</td>
-                            <td class="total">${form.paid_amount} $</td>
-                            <td></td>
-                        </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td class="total">DEJA PAYE:</td>
+                                <td class="total">${Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0) + Number(form.paid_amount)} $</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td class="total">REDUCTION:</td>
+                                <td class="total">0 $</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td class="total">RESTE A PAYER:</td>
+                                <td class="total">${((getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0)+ Number(form.paid_amount)))} $</td>
+                            </tr>
                         </tfoot>
                     </table>
                     <center>
@@ -164,6 +192,44 @@ function AvancePaiementChambreForm({hideForm, singleRoom}) {
             WinPrint.close();
         };
     };
+
+    const getTransactionOptions = async () => {
+        try {
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/getTranstionByRoomId/${singleRoom.id}`, {
+                method: 'GET',
+                headers: headerRequest
+            });
+            const res = await response.json();
+            console.log("DATAs:", res.data)
+            if (res.data) {
+                setTransactionData(res.data);
+            }
+            setLoader(false)
+        } catch (error) {
+            console.error("ERROR:", error);
+            setLoader(false)
+        }
+    }
+
+    const getDetteClientOptions = async () => {
+        try {
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/getDetteByRoomId/${singleRoom.id}`, {
+                method: 'GET',
+                headers: headerRequest
+            });
+            const res = await response.json();
+            console.log("DATA DETTE:", res.data)
+            if (res.data) {
+                setDetteData(res.data);
+            }
+            setLoader(false)
+        } catch (error) {
+            console.error("ERROR:", error);
+            setLoader(false)
+        }
+    }
 
     const submitData = async () => {
 
@@ -225,6 +291,8 @@ function AvancePaiementChambreForm({hideForm, singleRoom}) {
 
     useEffect(()=>{
         getAffectationOptions()
+        getTransactionOptions()
+        getDetteClientOptions()
     },[])
 
     return <>

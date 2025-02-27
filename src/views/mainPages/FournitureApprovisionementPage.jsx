@@ -14,6 +14,7 @@ function FournitureApprovisionementPage() {
     const [singleClient, setSingleClient] = useState({})
     let userdata = JSON.parse(localStorage.getItem('user'))
     let role = userdata.roles[0]
+    let permissions = userdata.permissions
     const { setLoader } = useContext(MainContext);
     const [deviseData, setDeviseData] = useState([]);
     const [deviseValue, setDeviseValue] = useState({});
@@ -460,10 +461,13 @@ function FournitureApprovisionementPage() {
                                                         <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.unit_price)}</span></td>
                                                         <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity}</span></td>
                                                         <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.unit_price * item.quantity)}</span></td>
-                                                        <td>
-                                                            <button className="btn btn-success p-9 me-1" onClick={() => modalValidateCommande({ id: item.id, status: "Validated" })}><i className="ph ph-check text-white"></i></button>
-                                                            <button className="btn btn-danger p-9" onClick={() => modalValidateCommande({ id: item.id, status: "Rejected" })}><i className="ph ph-trash text-white"></i></button>
-                                                        </td>
+                                                        {permissions.includes("Valider Commande DG")?(
+                                                            <td>
+                                                                <button className="btn btn-success p-9 me-1" onClick={() => modalValidateCommande({ id: item.id, status: "Validated" })}><i className="ph ph-check text-white"></i></button>
+                                                                <button className="btn btn-danger p-9" onClick={() => modalValidateCommande({ id: item.id, status: "Rejected" })}><i className="ph ph-trash text-white"></i></button>
+                                                            </td>
+                                                        ):<td></td>}
+                                                        
                                                     </tr>
                                                 ))
                                             ) : (<tr>
@@ -537,7 +541,9 @@ function FournitureApprovisionementPage() {
                                                                     {item.treasure_status == 1 ? <span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Validée</span> : ''}
                                                                 </td>
                                                                 <td>
-                                                                    <button className="btn btn-main p-9 me-1" onClick={() => modalValidateCommande({ id: item.id, status: "Validated" })}><i className="ph ph-check text-white"></i></button>
+                                                                    {permissions.includes("Valider Commande COMPTABLE") ?(
+                                                                        <button className="btn btn-main p-9 me-1" onClick={() => modalValidateCommande({ id: item.id, status: "Validated" })}><i className="ph ph-check text-white"></i></button>
+                                                                    ):null}
                                                                 </td>
                                                             </tr>
                                                         ))

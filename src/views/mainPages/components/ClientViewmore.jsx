@@ -101,9 +101,9 @@ function ClientViewmore({ hideForm, singleClient }) {
                 (index + 1).toString(),
                 formatDate(item.transaction_date).toString(),
                 item.motif.toString(),
-                item.loan_amount.toString(),
-                item.paid_amount.toString(),
-                (item.loan_amount - item.paid_amount) + " $"?.toString(),
+                get_net_value(item.loan_amount)?.toString(),
+                get_net_value(item.paid_amount)?.toString(),
+                get_net_value(item.loan_amount - item.paid_amount)?.toString(),
             ]);
             const itemDetailsHeaders = ['No', 'Date', 'Motif', 'Montant Total', 'Deja Payé', 'Montant Restant'];
             const columnWidths = [15, 30, 55, 30, 30, 30];

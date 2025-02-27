@@ -288,7 +288,7 @@ function ClotureChambre({ hideForm, singleRoom }) {
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Designation</th>
+                            <th>Chambre</th>
                             <th>Qté</th>
                             <th>P.U</th>
                             <th>P.T</th>
@@ -308,7 +308,7 @@ function ClotureChambre({ hideForm, singleRoom }) {
                             ))}
                             <tr>
                                 <td>${detteData.length + 1}</td>
-                                <td>Nombre des nuités</td>
+                                <td>${singleRoom.designation} - ${singleRoom.categorie}</td>
                                 <td>${form._nombre_nuite} Jours</td>
                                 <td>${form._unite_price} $</td>
                                 <td>${(form._nombre_nuite) * (form._unite_price)} $</td>
@@ -345,7 +345,7 @@ function ClotureChambre({ hideForm, singleRoom }) {
                             ))}
                             <tr>
                                 <td>${detteData.length + 1}</td>
-                                <td>Nombre des nuités</td>
+                                <td>${singleRoom.designation} - ${singleRoom.categorie}</td>
                                 <td>${getDaysBetweenDates(affectationData.start_date, affectationData.end_date)} Jours</td>
                                 <td>${singleRoom.unite_price} $</td>
                                 <td>${getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)} $</td>
@@ -365,7 +365,7 @@ function ClotureChambre({ hideForm, singleRoom }) {
                             </tr>
                             <tr>
                                 <td colspan="3"></td>
-                                <td class="total">TOTAL:</td>
+                                <td class="total">RESTE A PAYER:</td>
                                 <td class="total">${((getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0))) - reduction} $</td>
                             </tr>
                         </tfoot>`}
@@ -405,7 +405,7 @@ function ClotureChambre({ hideForm, singleRoom }) {
                         <li className="list-group-item">Prix Total de location chambre: {(form._nombre_nuite) * (form._unite_price)} $</li>
                         <li className="list-group-item">Montant payé: <input value={form._paid_amount} onChange={(e) => setForm({...form, _paid_amount: e.target.value})} type="number" style={{ border: 0, width: 70 }} /> $</li>
                         <li className="list-group-item">Redution: <input value={form._reduction} onChange={(e) => setForm({...form, _reduction: e.target.value})} type="number" style={{ border: 0, width: 70 }} /> $</li>
-                        <li className="list-group-item"><strong>PRIX TOTAL : {((form._nombre_nuite * (form._unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (form._paid_amount)) - (form._reduction)} $</strong></li>
+                        <li className="list-group-item"><strong>RESTE A PAYER : {((form._nombre_nuite * (form._unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (form._paid_amount)) - (form._reduction)} $</strong></li>
                         <li className="list-group-item">Commentaire:
                             <textarea className="form-control py-11" id="fname" value={form._comment} onChange={(e) => { setForm({ ...form, _comment: e.target.value }) }}
                                 placeholder="Entrer un commentaire"></textarea>
@@ -421,7 +421,7 @@ function ClotureChambre({ hideForm, singleRoom }) {
                         <li className="list-group-item">Prix Total de location chambre: {getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)} $</li>
                         <li className="list-group-item">Montant payé: {Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0)} $</li>
                         <li className="list-group-item">Redution: <input value={reduction} onChange={(e) => setReduction(e.target.value)} type="number" style={{ border: 0, width: 70 }} /></li>
-                        <li className="list-group-item"><strong>PRIX TOTAL : {((getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0))) - reduction} $</strong></li>
+                        <li className="list-group-item"><strong>RESTE A PAYER : {((getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0))) - reduction} $</strong></li>
                         <li className="list-group-item">Commentaire:
                             <textarea className="form-control py-11" id="fname" value={form.comment} onChange={(e) => { setForm({ ...form, comment: e.target.value }) }}
                                 placeholder="Entrer un commentaire"></textarea>

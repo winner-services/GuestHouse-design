@@ -3,10 +3,6 @@ import { NavLink } from "react-router-dom"
 function SidebarPage() {
     let userdata = JSON.parse(localStorage.getItem('user'))
     let permissions = userdata.permissions
-    const handleSubmenuClick = (event) => {
-        event.stopPropagation(); // Prevent the click from closing the parent dropdown
-        // ... your other logic for the submenu item click (e.g., navigation) ...
-    };
 
     return <>
         <aside className="sidebar">
@@ -77,7 +73,7 @@ function SidebarPage() {
                                             </a>
                                             <ul className="dropdown-menu">
                                                 <li><NavLink to="/main/fournitures" className="dropdown-item">Autres Fournitures</NavLink></li>
-                                                <li><NavLink to="/main/fournitures-approvisionement" className="dropdown-item">Approvisionnements</NavLink></li>
+                                                <li><NavLink to="/main/fournitures-approvisionement" className="dropdown-item">Commandes Fournitures</NavLink></li>
                                                 <li><NavLink to="/main/fournitures-acquisition" className="dropdown-item">Acquisitions</NavLink></li>
                                             </ul>
                                         </div>

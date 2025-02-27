@@ -114,8 +114,8 @@ function ProductForm({ hideForm, singleProduct }) {
         let submit_form = form
         
         if (form.id) {
-            url = `updateProductCategory/${form.id}`
-            method = 'PUT'
+            url = `updateProduct/${form.id}`
+            method = 'POST'
         } else if (modalVisible && unitFormVisible) {
             url = `createUnit`
             method = 'POST'

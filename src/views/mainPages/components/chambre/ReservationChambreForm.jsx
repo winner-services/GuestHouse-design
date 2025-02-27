@@ -60,9 +60,12 @@ function ReservationChambreForm({hideForm, singleRoom}) {
             if (res.success) {
                 toastr.success("Une chambre a ete reserve avec success", "Success");
                 hideForm(false)
-                Object.keys(form).forEach(function (key, index) {
-                    delete form[key];
-                });
+                // Object.keys(form).forEach(function (key, index) {
+                //     delete form[key];
+                // });
+                if (form.paid_amount > 0) {
+                    handleDownloadPDF(res.reference)
+                }
                 setLoader(false)
             } else {
                 toastr.error("Veillez reessayez", "Erreur");
@@ -76,6 +79,162 @@ function ReservationChambreForm({hideForm, singleRoom}) {
             setLoader(false)
         }
     }
+
+    function getDaysBetweenDates(startDateString, endDateString) {
+        // Convert strings to Date objects
+        const startDate = new Date(startDateString);
+        const endDate = new Date(endDateString);
+
+        // Calculate the difference in  milliseconds
+        const timeDiff = endDate - startDate;
+
+        // Convert milliseconds to days
+        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+        return daysDiff==0?1:daysDiff;
+    }
+
+    const handleDownloadPDF = (reference) => {
+        const logoImage = new Image();
+        logoImage.src = "/assets/images/logo.png";
+        const client = clientData.find((item) => item.id == form.customer_id)
+        logoImage.onload = () => {
+            // Open the print window
+            const WinPrint = window.open("", "facture", "");
+
+            WinPrint.document.write(`<!DOCTYPE html>
+                    <head>
+                    <style>
+                        body {
+                            font-family: sans-serif;
+                            font-size: 10px;
+                            display: flex; 
+                            justify-content: center; 
+                            align-items: center;
+                            margin: 0; 
+                        }
+
+                        .invoice-container {
+                        width: 70mm; /* Adjust width as needed */
+                        margin: 10mm auto;
+                        padding: 5mm;
+                        }
+
+                        .header {
+                        text-align: center;
+                        margin-bottom: 5mm;
+                        }
+
+                        .company-info {
+                        margin-bottom: 5mm;
+                        }
+
+                        .client-info {
+                        margin-bottom: 1mm;
+                        }
+
+                        table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        }
+
+                        th, td {
+                        border: 1px solid #ccc;
+                        padding: 2mm;
+                        text-align: left;
+                        }
+
+                        .total {
+                        font-weight: bold;
+                        }
+
+                        @page {
+                        size: auto;
+                        margin: 0mm; 
+                        }
+
+                        html { 
+                        -moz-print-margin-top: 0mm; 
+                        -moz-print-margin-bottom: 0mm; 
+                        }
+
+                        .logo {
+                            width: 90px; /* Adjust as needed */
+                            margin-bottom: 2mm;
+                        }
+                    </style>
+                    </head>
+                    <body>
+
+                    <div class="invoice-container">
+                    <div class="header">
+                        <img class="logo" src="/assets/images/logo.png" alt="Your Company Logo"><br>
+                        <strong>JOHN SERVICES MOTEL</strong><br>
+                        Q.les volcans, av.les messagers N° 13-B<br>
+                        RCCM: 22-A-01622<br>
+                        Impôt : A2315632S<br>
+                        +243999023794<br>
+                        johnservices@gmail.com<br>
+                        <span>Date: ${formatDate(today)} ${now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds()}</span>
+                        <h2>FACTURE No: ${reference}</h2>
+                    </div>
+
+                    <div class="client-info">
+                        <strong>Client:</strong><br>
+                        ${client ? client.name : '-'}<br>
+                        ${client ? client.phone : ''}
+                    </div>
+
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Chambre</th>
+                            <th>Qté</th>
+                            <th>P.U</th>
+                            <th>P.T</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>${singleRoom.designation} - ${singleRoom.categorie}</td>
+                                <td>${getDaysBetweenDates(form.start_date, form.end_date)} Jours</td>
+                                <td>${singleRoom.unite_price} $</td>
+                                <td>${getDaysBetweenDates(form.start_date, form.end_date) * (singleRoom.unite_price)} $</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td class="total">DEJA PAYE:</td>
+                                <td class="total">${Number(form.paid_amount)} $</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td class="total">REDUCTION:</td>
+                                <td class="total">0 $</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td class="total">RESTE A PAYER:</td>
+                                <td class="total">${((getDaysBetweenDates(form.start_date, form.end_date) * (singleRoom.unite_price)) - (Number(form.paid_amount)))} $</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <center>
+                        <i>Merci d'avoir acheté chez nous. Revenez encore prochainement</i>
+                    </center>
+                </div>
+                </body>
+            </html>`);
+
+            WinPrint.document.close();
+            WinPrint.focus();
+            WinPrint.print();
+            WinPrint.close();
+        };
+    };
 
     const getClientOptions = async () => {
         try {

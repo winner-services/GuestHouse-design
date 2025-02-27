@@ -39,10 +39,24 @@ function AttributionChambreForm({ hideForm, singleRoom }) {
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
 
+    function getDaysBetweenDates(startDateString, endDateString) {
+        // Convert strings to Date objects
+        const startDate = new Date(startDateString);
+        const endDate = new Date(endDateString);
+
+        // Calculate the difference in  milliseconds
+        const timeDiff = endDate - startDate;
+
+        // Convert milliseconds to days
+        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+        return daysDiff==0?1:daysDiff;
+    }
+
     const handleDownloadPDF = (reference) => {
         const logoImage = new Image();
         logoImage.src = "/assets/images/logo.png";
-        const client = clientData.find((item) => item.id == form.id)
+        const client = clientData.find((item) => item.id == form.customer_id)
         logoImage.onload = () => {
             // Open the print window
             const WinPrint = window.open("", "facture", "");
@@ -135,24 +149,36 @@ function AttributionChambreForm({ hideForm, singleRoom }) {
                         <tr>
                             <th>#</th>
                             <th>Chambre</th>
-                            <th>Montant</th>
-                            <th>Obs.</th>
+                            <th>Qté</th>
+                            <th>P.U</th>
+                            <th>P.T</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>${singleRoom.designation} - ${singleRoom.categorie}</td>
-                            <td>${form.paid_amount} $</td>
-                            <td></td>
+                            <tr>
+                                <td>1</td>
+                                <td>${singleRoom.designation} - ${singleRoom.categorie}</td>
+                                <td>${getDaysBetweenDates(form.start_date, form.end_date)} Jours</td>
+                                <td>${singleRoom.unite_price} $</td>
+                                <td>${getDaysBetweenDates(form.start_date, form.end_date) * (singleRoom.unite_price)} $</td>
                             </tr>
                         </tbody>
                         <tfoot>
-                        <tr>
-                            <td colspan="2" class="total">TOTAL:</td>
-                            <td class="total">${form.paid_amount} $</td>
-                            <td></td>
-                        </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td class="total">DEJA PAYE:</td>
+                                <td class="total">${Number(form.paid_amount)} $</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td class="total">REDUCTION:</td>
+                                <td class="total">0 $</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td class="total">RESTE A PAYER:</td>
+                                <td class="total">${((getDaysBetweenDates(form.start_date, form.end_date) * (singleRoom.unite_price)) - (Number(form.paid_amount)))} $</td>
+                            </tr>
                         </tfoot>
                     </table>
                     <center>
@@ -192,7 +218,7 @@ function AttributionChambreForm({ hideForm, singleRoom }) {
                 //     delete form[key];
                 // });
                 if (form.paid_amount > 0) {
-                    handleDownloadPDF(res.reference, res.client)
+                    handleDownloadPDF(res.reference)
                 }
                 setLoader(false)
             } else {

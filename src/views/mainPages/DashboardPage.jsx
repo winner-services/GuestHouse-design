@@ -5,6 +5,8 @@ import Pagination from "../../pagination/Pagination"
 import { Dropdown } from 'react-bootstrap';
 
 function DashboardPage() {
+    let userdata = JSON.parse(localStorage.getItem('user'))
+    let permissions = userdata.permissions
     var CanvasJS = CanvasJSReact.CanvasJS;
     var CanvasJSChart = CanvasJSReact.CanvasJSChart;
     const { setLoader } = useContext(MainContext);
@@ -90,7 +92,7 @@ function DashboardPage() {
         }]
     }
 
-    const getData = async (page = 1, form_data=form) => {
+    const getData = async (page = 1, form_data = form) => {
         try {
             setLoader(true)
             const response = await fetch(`${BaseUrl}/getDashBoardData?page=${page}`, {
@@ -132,7 +134,7 @@ function DashboardPage() {
     }
 
     const change_first_date = (start_date) => {
-        setForm({...form, first_date: start_date})
+        setForm({ ...form, first_date: start_date })
         let form_current = {
             first_date: start_date,
             end_date: form.end_date
@@ -141,7 +143,7 @@ function DashboardPage() {
     }
 
     const change_end_date = (end_date) => {
-        setForm({...form, end_date: end_date})
+        setForm({ ...form, end_date: end_date })
         let form_current = {
             first_date: form.first_date,
             end_date: end_date
@@ -202,76 +204,78 @@ function DashboardPage() {
                 </div>
                 {/* Breadcrumb Right End */}
             </div>
-
-            <div className="row gy-4">
-                <div className="col-lg-12">
-                    {/* Widgets Start */}
-                    <div className="row gy-4">
-                        <div className="col-xxl-3 col-sm-6">
-                            <div className="card">
-                                <div className="card-body">
-                                    <h4 className="mb-2">{get_net_value(mainData.recette_produit)}</h4>
-                                    <span className="text-gray-600">Recette Vente</span>
-                                    <div className="flex-between gap-8 mt-16">
-                                        <span
-                                            className="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-main-two-600 text-white text-2xl"><i
-                                                className="ph-fill ph-shopping-cart"></i></span>
-                                        <div id="earned-certificate" className="remove-tooltip-title rounded-tooltip-value">
+            {permissions.includes("Voir Eléments Tableau de Bord") ? (
+                <div className="row gy-4">
+                    <div className="col-lg-12">
+                        {/* Widgets Start */}
+                        <div className="row gy-4">
+                            <div className="col-xxl-3 col-sm-6">
+                                <div className="card">
+                                    <div className="card-body">
+                                        <h4 className="mb-2">{get_net_value(mainData.recette_produit)}</h4>
+                                        <span className="text-gray-600">Recette Vente</span>
+                                        <div className="flex-between gap-8 mt-16">
+                                            <span
+                                                className="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-main-two-600 text-white text-2xl"><i
+                                                    className="ph-fill ph-shopping-cart"></i></span>
+                                            <div id="earned-certificate" className="remove-tooltip-title rounded-tooltip-value">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-xxl-3 col-sm-6">
+                                <div className="card">
+                                    <div className="card-body">
+                                        <h4 className="mb-2">{get_net_value(mainData.recette_chambre)}</h4>
+                                        <span className="text-gray-600">Recette Chambre</span>
+                                        <div className="flex-between gap-8 mt-16">
+                                            <span
+                                                className="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-main-two-600 text-white text-2xl"><i
+                                                    className="ph-fill ph-bed"></i></span>
+                                            <div id="earned-certificate" className="remove-tooltip-title rounded-tooltip-value">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-xxl-3 col-sm-6">
+                                <div className="card">
+                                    <div className="card-body">
+                                        <h4 className="mb-2">{get_net_value(mainData.total_vente)}</h4>
+                                        <span className="text-gray-600">Total Dette Clients</span>
+                                        <div className="flex-between gap-8 mt-16">
+                                            <span
+                                                className="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-purple-600 text-white text-2xl">
+                                                <i className="ph-fill ph-users-three"></i></span>
+                                            <div id="course-progress" className="remove-tooltip-title rounded-tooltip-value">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-xxl-3 col-sm-6">
+                                <div className="card">
+                                    <div className="card-body">
+                                        <h4 className="mb-2">{get_net_value(mainData.total_depense)}</h4>
+                                        <span className="text-gray-600">Total Depenses</span>
+                                        <div className="flex-between gap-8 mt-16">
+                                            <span
+                                                className="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-warning-600 text-white text-2xl"><i
+                                                    className="ph-fill ph-money"></i></span>
+                                            <div id="community-support" className="remove-tooltip-title rounded-tooltip-value">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="col-xxl-3 col-sm-6">
-                            <div className="card">
-                                <div className="card-body">
-                                    <h4 className="mb-2">{get_net_value(mainData.recette_chambre)}</h4>
-                                    <span className="text-gray-600">Recette Chambre</span>
-                                    <div className="flex-between gap-8 mt-16">
-                                        <span
-                                            className="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-main-two-600 text-white text-2xl"><i
-                                                className="ph-fill ph-bed"></i></span>
-                                        <div id="earned-certificate" className="remove-tooltip-title rounded-tooltip-value">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-xxl-3 col-sm-6">
-                            <div className="card">
-                                <div className="card-body">
-                                    <h4 className="mb-2">{get_net_value(mainData.total_vente)}</h4>
-                                    <span className="text-gray-600">Total Dette Clients</span>
-                                    <div className="flex-between gap-8 mt-16">
-                                        <span
-                                            className="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-purple-600 text-white text-2xl">
-                                            <i className="ph-fill ph-users-three"></i></span>
-                                        <div id="course-progress" className="remove-tooltip-title rounded-tooltip-value">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-xxl-3 col-sm-6">
-                            <div className="card">
-                                <div className="card-body">
-                                    <h4 className="mb-2">{get_net_value(mainData.total_depense)}</h4>
-                                    <span className="text-gray-600">Total Depenses</span>
-                                    <div className="flex-between gap-8 mt-16">
-                                        <span
-                                            className="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-warning-600 text-white text-2xl"><i
-                                                className="ph-fill ph-money"></i></span>
-                                        <div id="community-support" className="remove-tooltip-title rounded-tooltip-value">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        {/* Widgets End */}
                     </div>
-                    {/* Widgets End */}
-                </div>
 
-            </div>
+                </div>
+            ) : null}
+
 
             <div className="row">
                 <div className="col-lg-4">
