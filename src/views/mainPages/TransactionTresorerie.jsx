@@ -16,6 +16,8 @@ function TransactionTresorerie() {
     const [deviseData, setDeviseData] = useState([]);
     const [deviseValue, setDeviseValue] = useState({});
     const [modalVisible, setModalVisible] = useState(false);
+    const [comptetData, setCompteData] = useState([])
+    const [comptetName, setCompteName] = useState({})
     var now = new Date();
     var month = (now.getMonth() + 1);
     var day = now.getDate();
@@ -26,7 +28,8 @@ function TransactionTresorerie() {
     var today = now.getFullYear() + '-' + month + '-' + day;
     const [form, setForm] = useState({
         date_start: today,
-        date_end: today
+        date_end: today,
+        account_id: ""
     })
     const hideModal = () => {
         setForm({ ...form, date_end: today, date_start: today })
@@ -41,10 +44,29 @@ function TransactionTresorerie() {
         });
     }
 
-    const getData = async (page = 1, q = '') => {
+    const getCompteOptions = async () => {
         try {
             setLoader(true)
-            const response = await fetch(`${BaseUrl}/getTransactionData?page=${page}&q=${q}`, {
+            const response = await fetch(`${BaseUrl}/getAllAccounts`, {
+                method: 'GET',
+                headers: headerRequest
+            });
+            const res = await response.json();
+            console.log("DATAs:", res.data)
+            if (res.data) {
+                setCompteData(res.data);
+            }
+            setLoader(false)
+        } catch (error) {
+            console.error("ERROR:", error);
+            setLoader(false)
+        }
+    }
+
+    const getData = async (page = 1, q = '', compte = null) => {
+        try {
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/getTransactionData?page=${page}&q=${q}&account_id=${compte}`, {
                 method: 'GET',
                 headers: headerRequest
             });
@@ -134,12 +156,13 @@ function TransactionTresorerie() {
                     (index + 1).toString(),
                     formatDate(item.transaction_date).toString(),
                     item.motif?.toString(),
-                    item.account_name?.toString(),
+                    item.account?.toString(),
                     item.transaction_type == 'RECETTE' ? get_net_value(item.amount) : ('-')?.toString(),
                     item.transaction_type == 'DEPENSE' ? get_net_value(item.amount) : ('-')?.toString(),
+                    get_net_value(item.solde)?.toString(),
                 ]);
-                const itemDetailsHeaders = ['No', 'Date', 'Motif', 'Compte', 'Debit', 'Credit'];
-                const columnWidths = [15, 25, 50, 30, 35, 30];
+                const itemDetailsHeaders = ['No', 'Date', 'Motif', 'Compte', 'Entrée', 'Sortie', 'Solde'];
+                const columnWidths = [15, 25, 30, 30, 30, 30, 30];
                 // Define table styles
                 const headerStyles = {
                     fillColor: [240, 240, 240],
@@ -229,8 +252,14 @@ function TransactionTresorerie() {
         return `${result} ${deviseValue.symbol}`
     }
 
+    const setCompteFn = (model) => {
+        setCompteName(model)
+        getData(1, '', model.id)
+    }
+
     useEffect(() => {
         getData()
+        getCompteOptions()
     }, [])
 
 
@@ -257,6 +286,19 @@ function TransactionTresorerie() {
                         </div>
                         <div
                             className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
+                            <Dropdown className="me-1">
+                                <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                                    {comptetName.designation ? comptetName.designation : 'Caisse'}
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    {comptetData.map((item, index) => (
+                                        <Dropdown.Item key={index} onClick={() => setCompteFn(item)}>
+                                            {item.designation}
+                                        </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
                             <Dropdown className="me-1">
                                 <Dropdown.Toggle variant="secondary" id="dropdown-basic">
                                     {deviseValue ? deviseValue.symbol : ''}
@@ -287,8 +329,9 @@ function TransactionTresorerie() {
                                     <th className="h6 text-gray-300">Date</th>
                                     <th className="h6 text-gray-300">Motif</th>
                                     <th className="h6 text-gray-300">Compte</th>
-                                    <th className="h6 text-gray-300">Debit</th>
-                                    <th className="h6 text-gray-300">Credit</th>
+                                    <th className="h6 text-gray-300">Entrée</th>
+                                    <th className="h6 text-gray-300">Sortie</th>
+                                    <th className="h6 text-gray-300">Solde</th>
                                     <th className="h6 text-gray-300">Actions</th>
                                 </tr>
                             </thead>
@@ -303,6 +346,7 @@ function TransactionTresorerie() {
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.account_name}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.transaction_type == 'RECETTE' ? get_net_value(item.amount) : '-'}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.transaction_type == 'DEPENSE' ? get_net_value(item.amount) : '-'}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.solde)}</span></td>
                                                 <td>
                                                     <button className="btn btn-info p-9 me-1" onClick={() => modelViewMore(item)}><i className="ph ph-printer text-white"></i></button>
                                                     <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
@@ -310,7 +354,7 @@ function TransactionTresorerie() {
                                             </tr>
                                         ))
                                     ) : (<tr>
-                                        <td colSpan={7}>
+                                        <td colSpan={8}>
                                             <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
                                         </td>
                                     </tr>)
@@ -341,12 +385,21 @@ function TransactionTresorerie() {
                             <input type="date" className="form-control py-11" id="address" value={form.date_end} onChange={(e) => { setForm({ ...form, date_end: e.target.value }) }}
                             />
                         </div>
+                        <div className="col-sm-12 col-xs-12">
+                            <label htmlFor="lname" className="form-label mb-8 h6 me-1">Compte de tresorerie <span className="text-danger">*</span></label>
+                            <select className="form-control py-11" value={form.account_id} onChange={(e) => { setForm({ ...form, account_id: e.target.value }) }}>
+                                <option hidden>Selectionner une option</option>
+                                {comptetData.map((item, index) => (
+                                    <option value={item.id} key={index}>{item.designation}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                 </Modal.Body>
                 <Modal.Footer>
                     <button className="btn btn-outline-danger bg-danger-100 border-danger-100 text-danger-600 rounded-pill py-9" onClick={hideModal}>Annuler</button>
-                    <button type="button" className="btn btn-main rounded-pill py-9" onClick={() => downloadReport()}>Enregistrer</button>
+                    <button type="button" className="btn btn-main rounded-pill py-9" onClick={() => downloadReport()}>Telecharger</button>
                 </Modal.Footer>
             </Modal>
         </>

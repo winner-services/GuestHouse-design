@@ -353,7 +353,7 @@ function AcquisitionFourniturePage() {
                 </Modal.Body>
                 <Modal.Footer>
                     <button className="btn btn-outline-danger bg-danger-100 border-danger-100 text-danger-600 rounded-pill py-9" onClick={hideModal}>Annuler</button>
-                    <button type="button" className="btn btn-main rounded-pill py-9" onClick={() => downloadReport()}>Enregistrer</button>
+                    <button type="button" className="btn btn-main rounded-pill py-9" onClick={() => downloadReport()}>Telecharger</button>
                 </Modal.Footer>
             </Modal>
         </>

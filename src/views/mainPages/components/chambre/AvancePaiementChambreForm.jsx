@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../../../config/MainContext";
 
-function AvancePaiementChambreForm({hideForm, singleRoom}) {
+function AvancePaiementChambreForm({ hideForm, singleRoom }) {
     const [affectationData, setAffectationData] = useState({})
     const [transasctionData, setTransactionData] = useState([])
     const [detteData, setDetteData] = useState([])
     const { setLoader } = useContext(MainContext);
+    const [accountData, setAccountData] = useState([]);
     var now = new Date();
     var month = (now.getMonth() + 1);
     var day = now.getDate();
@@ -15,25 +16,26 @@ function AvancePaiementChambreForm({hideForm, singleRoom}) {
         day = "0" + day;
     var today = now.getFullYear() + '-' + month + '-' + day;
     const [form, setForm] = useState({
-        transaction_date:today,
-        paid_amount:0,
-        index:5
+        transaction_date: today,
+        paid_amount: 0,
+        account_id: "",
+        index: 5
     })
 
     function formatDate(isoString) {
         // Create a Date object from the ISO string
         const date = new Date(isoString);
-      
+
         // Extract individual components
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
-        const  
-       hours = String(date.getHours()).padStart(2, '0');
+        const
+            hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2,  
-       '0');
-      
+        const seconds = String(date.getSeconds()).padStart(2,
+            '0');
+
         // Construct the desired format
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
@@ -49,7 +51,7 @@ function AvancePaiementChambreForm({hideForm, singleRoom}) {
         // Convert milliseconds to days
         const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
-        return daysDiff==0?1:daysDiff;
+        return daysDiff == 0 ? 1 : daysDiff;
     }
 
     const handleDownloadPDF = (reference, client) => {
@@ -132,7 +134,7 @@ function AvancePaiementChambreForm({hideForm, singleRoom}) {
                         Impôt : A2315632S<br>
                         +243999023794<br>
                         johnservices@gmail.com<br>
-                        <span>Date: ${formatDate(today)} ${now.getHours()+":"+now.getMinutes()+":"+now.getSeconds()}</span>
+                        <span>Date: ${formatDate(today)} ${now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds()}</span>
                         <h2>FACTURE No: ${reference}</h2>
                     </div>
 
@@ -175,7 +177,7 @@ function AvancePaiementChambreForm({hideForm, singleRoom}) {
                             <tr>
                                 <td colspan="3"></td>
                                 <td class="total">RESTE A PAYER:</td>
-                                <td class="total">${((getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0)+ Number(form.paid_amount)))} $</td>
+                                <td class="total">${((getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0) + Number(form.paid_amount)))} $</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -204,6 +206,25 @@ function AvancePaiementChambreForm({hideForm, singleRoom}) {
             console.log("DATAs:", res.data)
             if (res.data) {
                 setTransactionData(res.data);
+            }
+            setLoader(false)
+        } catch (error) {
+            console.error("ERROR:", error);
+            setLoader(false)
+        }
+    }
+
+    const getAccountOptions = async () => {
+        try {
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/getAllAccounts`, {
+                method: 'GET',
+                headers: headerRequest
+            });
+            const res = await response.json();
+            console.log("DATAs:", res.data)
+            if (res.data) {
+                setAccountData(res.data);
             }
             setLoader(false)
         } catch (error) {
@@ -289,31 +310,41 @@ function AvancePaiementChambreForm({hideForm, singleRoom}) {
     }
 
 
-    useEffect(()=>{
+    useEffect(() => {
         getAffectationOptions()
         getTransactionOptions()
         getDetteClientOptions()
-    },[])
+        getAccountOptions()
+    }, [])
 
     return <>
         <div className="row">
             <h4>Avance du paiement de la chambre</h4>
             <div className="col-sm-12 col-xs-12 mb-8">
-                <label htmlFor="fname" className="form-label mb-8 h6">Date de l'operation</label>
+                <label htmlFor="fname" className="form-label mb-8 h6">Date de l'operation <span className="text-danger">*</span></label>
                 <input type="date" className="form-control py-11" id="fname" value={form.transaction_date} onChange={(e) => { setForm({ ...form, transaction_date: e.target.value }) }}
                     placeholder="Entrer une date" />
             </div>
             <div className="col-sm-12 col-xs-12 mb-8">
-                <label htmlFor="fname" className="form-label mb-8 h6">Montant payé</label>
+                <label htmlFor="fname" className="form-label mb-8 h6">Montant payé <span className="text-danger">*</span></label>
                 <input type="number" className="form-control py-11" id="fname" value={form.paid_amount} onChange={(e) => { setForm({ ...form, paid_amount: e.target.value }) }}
                     placeholder="Entrer un montant" />
+            </div>
+            <div className="col-sm-12 col-xs-12 mb-8">
+                <label htmlFor="email" className="form-label mb-8 h6">Compte <span className="text-danger">*</span></label>
+                <select id="" value={form.account_id} onChange={(e) => { setForm({ ...form, account_id: e.target.value }) }} className="form-control py-11">
+                    <option hidden>Selectionnez un compte</option>
+                    {accountData.map((item, index) => (
+                        <option value={item.id} key={index}>{item.designation}</option>
+                    ))}
+                </select>
             </div>
 
             <div className="col-sm-12">
                 <button className="btn btn-outline-danger bg-danger-100 border-danger-100 text-danger-600 rounded-pill py-9 me-1" onClick={hideForm}>Annuler</button>
                 <button type="button" className="btn btn-main rounded-pill py-9" onClick={submitData}>Enregistrer</button>
             </div>
-            
+
         </div>
 
     </>

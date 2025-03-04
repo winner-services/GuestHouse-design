@@ -3,6 +3,7 @@ import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
 import SupplierForm from "./components/SupplierForm"
 import Modal from 'react-bootstrap/Modal';
+import { Dropdown } from 'react-bootstrap';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
@@ -13,6 +14,8 @@ function HistoriqueAffectationChambre() {
     const [entries, setEntries] = useState([])
     const { setLoader } = useContext(MainContext);
     const [modalVisible, setModalVisible] = useState(false);
+    const [deviseData, setDeviseData] = useState([])
+    const [deviseValue, setDeviseValue] = useState({})
     var now = new Date();
     var month = (now.getMonth() + 1);
     var day = now.getDate();
@@ -50,6 +53,8 @@ function HistoriqueAffectationChambre() {
             if (res.data) {
                 setData(res.data.data);
                 setEntries(res.data);
+                setDeviseData(res.devise)
+                setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type == 'devise_principale')[0])
             }
             setLoader(false)
         } catch (error) {
@@ -58,9 +63,13 @@ function HistoriqueAffectationChambre() {
         }
     }
 
-    const modelUpdate = (model) => {
-        setsingleSupplier(model)
-        seteFormVisible(true)
+    const changeDevise = (model) => {
+        setDeviseValue(model)
+    }
+
+    const get_net_value = (value) => {
+        let result = Number(value) * Number(deviseValue.conversion_amount)
+        return `${result} ${deviseValue.symbol}`
     }
 
     const searchDataFn = (searchData) => {
@@ -119,14 +128,14 @@ function HistoriqueAffectationChambre() {
                 const itemDetailsRows = printData?.map((item, index) => [
                     (index + 1).toString(),
                     item.reference?.toString(),
-                    "Du "+formatDate(item.start_date).toString()+" Au "+formatDate(item.end_date).toString(),
+                    "Du " + formatDate(item.start_date).toString() + " Au " + formatDate(item.end_date).toString(),
                     item.customer?.toString(),
                     item.room?.toString(),
                     item.payment_status == 'paid' ? ("Soldé") : ("Non soldé")?.toString(),
                     item.room_status?.toString(),
                 ]);
-                const itemDetailsHeaders = ['No', 'Date', 'Reference', 'Client', 'Chambre', 'Paiment','Etat Chambre'];
-                const columnWidths = [15, 35, 30, 30, 35, 20,20];
+                const itemDetailsHeaders = ['No', 'Date', 'Reference', 'Client', 'Chambre', 'Paiment', 'Etat Chambre'];
+                const columnWidths = [15, 35, 30, 30, 35, 20, 20];
                 // Define table styles
                 const headerStyles = {
                     fillColor: [240, 240, 240],
@@ -249,6 +258,19 @@ function HistoriqueAffectationChambre() {
                         </div>
                         <div
                             className="flex-align text-gray-500 text-13 border border-gray-100 rounded-4 ">
+                            <Dropdown className="me-1">
+                                <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                                    {deviseValue ? deviseValue.symbol : ''}
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    {deviseData.map((item, index) => (
+                                        <Dropdown.Item key={index} onClick={() => changeDevise(item)}>
+                                            {item.symbol}
+                                        </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
 
                             <button className="btn btn-success me-1" onClick={() => setModalVisible(true)}>Telecharger</button>
                         </div>
@@ -267,7 +289,8 @@ function HistoriqueAffectationChambre() {
                                     <th className="h6 text-gray-300">Date</th>
                                     <th className="h6 text-gray-300">Client</th>
                                     <th className="h6 text-gray-300">Chambre</th>
-                                    <th className="h6 text-gray-300">Paiment</th>
+                                    <th className="h6 text-gray-300">Montant</th>
+                                    <th className="h6 text-gray-300">Statut Paiment</th>
                                     <th className="h6 text-gray-300">Etat Chambre</th>
                                 </tr>
                             </thead>
@@ -281,12 +304,13 @@ function HistoriqueAffectationChambre() {
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">Du {formatDate(item.start_date)} au {formatDate(item.end_date)}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.customer}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.room}</span></td>
+                                                <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.amount_paid)}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.payment_status == 'paid' ? "Soldé" : "Non soldé"}</span></td>
                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.room_status}</span></td>
                                             </tr>
                                         ))
                                     ) : (<tr>
-                                        <td colSpan={7}>
+                                        <td colSpan={8}>
                                             <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
                                         </td>
                                     </tr>)
@@ -322,7 +346,7 @@ function HistoriqueAffectationChambre() {
                 </Modal.Body>
                 <Modal.Footer>
                     <button className="btn btn-outline-danger bg-danger-100 border-danger-100 text-danger-600 rounded-pill py-9" onClick={hideModal}>Annuler</button>
-                    <button type="button" className="btn btn-main rounded-pill py-9" onClick={() => downloadReport()}>Enregistrer</button>
+                    <button type="button" className="btn btn-main rounded-pill py-9" onClick={() => downloadReport()}>Telecharger</button>
                 </Modal.Footer>
             </Modal>
         </>

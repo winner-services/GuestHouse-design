@@ -140,7 +140,7 @@ function ClientPage() {
                                             </tr>
                                         ))
                                     ) : (<tr>
-                                        <td colSpan={7}>
+                                        <td colSpan={9}>
                                             <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
                                         </td>
                                     </tr>)

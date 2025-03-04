@@ -4,6 +4,7 @@ import { MainContext } from "../../../../config/MainContext";
 function ReservationChambreForm({hideForm, singleRoom}) {
     const [clientData, setclientData] = useState([])
     const { setLoader } = useContext(MainContext);
+    const [accountData, setAccountData] = useState([]); 
     var now = new Date();
     var month = (now.getMonth() + 1);
     var day = now.getDate();
@@ -18,6 +19,7 @@ function ReservationChambreForm({hideForm, singleRoom}) {
         paid_amount:0,
         start_date:today,
         end_date:today,
+        account_id: "",
         index:1
     })
 
@@ -255,8 +257,28 @@ function ReservationChambreForm({hideForm, singleRoom}) {
         }
     }
 
+    const getAccountOptions = async () => {
+        try {
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/getAllAccounts`, {
+                method: 'GET',
+                headers: headerRequest
+            });
+            const res = await response.json();
+            console.log("DATAs:", res.data)
+            if (res.data) {
+                setAccountData(res.data);
+            }
+            setLoader(false)
+        } catch (error) {
+            console.error("ERROR:", error);
+            setLoader(false)
+        }
+    }
+
     useEffect(()=>{
         getClientOptions()
+        getAccountOptions()
     },[])
 
     return <>
@@ -272,6 +294,17 @@ function ReservationChambreForm({hideForm, singleRoom}) {
                 <input type="number" className="form-control py-11" id="fname" value={form.paid_amount} onChange={(e) => { setForm({ ...form, paid_amount: e.target.value }) }}
                     placeholder="Entrer un montant" />
             </div>
+            {form.paid_amount > 0 ? (
+                <div className="col-sm-12 col-xs-12 mb-8">
+                    <label htmlFor="email" className="form-label mb-8 h6">Compte <span className="text-danger">*</span></label>
+                    <select id="" value={form.account_id} onChange={(e) => { setForm({ ...form, account_id: e.target.value }) }} className="form-control py-11">
+                        <option hidden>Selectionnez un compte</option>
+                        {accountData.map((item, index) => (
+                            <option value={item.id} key={index}>{item.designation}</option>
+                        ))}
+                    </select>
+                </div>
+            ) : null}
             <div className="col-sm-12 col-xs-12 mb-8">
                 <label htmlFor="email" className="form-label mb-8 h6">Client</label>
                 <select id="" value={form.customer_id} onChange={(e) => { setForm({ ...form, customer_id: e.target.value }) }} className="form-control py-11">

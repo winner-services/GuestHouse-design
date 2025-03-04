@@ -91,8 +91,8 @@ function SortieStockViewmore({ hideForm, singleClient }) {
                 item.product.toString(),
                 item.output_quantity?.toString() + " " + item.unite?.toString()
             ]); 
-            const itemDetailsHeaders = ['No', 'Produit', 'Qte'];
-            const columnWidths = [25, 80, 80,];
+            const itemDetailsHeaders = ['No', 'Produit', 'Qte','Qte Vendue', 'Qte Restante'];
+            const columnWidths = [25, 50, 50,30,30];
             // Define table styles
             const headerStyles = {
                 fillColor: [240, 240, 240],

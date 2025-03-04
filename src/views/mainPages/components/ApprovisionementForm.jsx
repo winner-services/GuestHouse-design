@@ -5,7 +5,7 @@ function ApprovisionementForm({ hideForm }) {
     const [productData, setproductData] = useState([])
     const [supplierData, setsupplierData] = useState([])
     const [pourchase_form, setpourchase_form] = useState([]);
-    const [brut_total_price, setbrut_total_price] = useState(0);
+    const [accountData, setAccountData] = useState([]);
 
     var now = new Date();
     var month = (now.getMonth() + 1);
@@ -20,9 +20,8 @@ function ApprovisionementForm({ hideForm }) {
         paid_amount: 0,
         supplier_id: "",
         total_price: 0,
-        compte_id: "",
         purchase_date: today,
-        account_id:1,
+        account_id: "",
     })
 
     const [form, setForm] = useState({
@@ -155,10 +154,37 @@ function ApprovisionementForm({ hideForm }) {
         });
     };
 
+    const getAccountOptions = async () => {
+        try {
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/getAllAccounts`, {
+                method: 'GET',
+                headers: headerRequest
+            });
+            const res = await response.json();
+            console.log("DATAs:", res.data)
+            if (res.data) {
+                setAccountData(res.data);
+            }
+            setLoader(false)
+        } catch (error) {
+            console.error("ERROR:", error);
+            setLoader(false)
+        }
+    }
+
     useEffect(() => {
-        getSupplierOptions()
-        getProductOptions()
-    }, [])
+        if (pourchase_form.length > 0) {
+            setBaseForm((prevBaseForm) => ({
+                ...prevBaseForm,
+                paid_amount: Object.values(pourchase_form).reduce((acc, item) => acc + item.total_price, 0)
+            }));
+        }else{
+            getSupplierOptions()
+            getProductOptions()
+            getAccountOptions()
+        }
+    }, [pourchase_form])
 
     return <>
         <div className="dashboard-body">
@@ -205,9 +231,9 @@ function ApprovisionementForm({ hideForm }) {
                                     <div className="col-sm-6 col-xs-6">
                                         <label htmlFor="address" className="form-label mb-8 h6">Reference</label>
                                         <input type="text" className="form-control py-11" id="address" value={base_form.reference} onChange={(e) => { setBaseForm({ ...base_form, reference: e.target.value }) }}
-                                            placeholder="Entrer une addresse" />
+                                            placeholder="Entrer une reference" />
                                     </div>
-                                    <div className="col-sm-6 col-xs-6">
+                                    <div className="col-sm-4 col-xs-4">
                                         <label htmlFor="email" className="form-label mb-8 h6">Fournisseur <span className="text-danger">*</span></label>
                                         <select id="" value={base_form.supplier_id} onChange={(e) => { setBaseForm({ ...base_form, supplier_id: e.target.value }) }} className="form-control py-11">
                                             <option hidden>Selectionnez un fournisseur</option>
@@ -216,10 +242,20 @@ function ApprovisionementForm({ hideForm }) {
                                             ))}
                                         </select>
                                     </div>
-                                    <div className="col-sm-6 col-xs-6">
+                                    <div className="col-sm-4 col-xs-4">
                                         <label htmlFor="address" className="form-label mb-8 h6">Montant Payé</label>
                                         <input type="number" className="form-control py-11" id="address" value={base_form.paid_amount} onChange={(e) => { setBaseForm({ ...base_form, paid_amount: e.target.value }) }}
                                             placeholder="Entrer un montant payé" />
+                                    </div>
+
+                                    <div className="col-sm-4 col-xs-4 mb-8">
+                                        <label htmlFor="email" className="form-label mb-8 h6">Compte <span className="text-danger">*</span></label>
+                                        <select id="" value={base_form.account_id} onChange={(e) => { setBaseForm({ ...base_form, account_id: e.target.value }) }} className="form-control py-11">
+                                            <option hidden>Selectionnez un compte</option>
+                                            {accountData.map((item, index) => (
+                                                <option value={item.id} key={index}>{item.designation}</option>
+                                            ))}
+                                        </select>
                                     </div>
 
                                     <div className="col-sm-12" style={{ marginTop: 15 }}>
@@ -244,7 +280,6 @@ function ApprovisionementForm({ hideForm }) {
                                                                     ...form,
                                                                     product_id: e.target.value,
                                                                     product_name: productData.find((item) => item.id == e.target.value).designation,
-                                                                    unite_price: productData.find((item) => item.id == e.target.value).unite_price,
                                                                     unit: productData.find((item) => item.id == e.target.value).unite,
                                                                 })
                                                             }} className="form-control" style={{ border: 'none' }}>

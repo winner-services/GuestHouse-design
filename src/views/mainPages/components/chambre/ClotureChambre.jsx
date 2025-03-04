@@ -2,11 +2,14 @@ import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../../../config/MainContext";
 
 function ClotureChambre({ hideForm, singleRoom }) {
+    let userdata = JSON.parse(localStorage.getItem('user'))
+    let permissions = userdata.permissions
     const [transasctionData, setTransactionData] = useState([])
     const [detteData, setDetteData] = useState([])
     const [affectationData, setAffectationData] = useState({})
     const [reduction, setReduction] = useState(0)
     const { setLoader } = useContext(MainContext);
+    const [accountData, setAccountData] = useState([]);
     const [is_additional_information_active, set_is_additional_information_active] = useState(false)
     var now = new Date();
     var month = (now.getMonth() + 1);
@@ -20,16 +23,18 @@ function ClotureChambre({ hideForm, singleRoom }) {
         origin_room_id: singleRoom.id,
         destination_room_id: "",
         comment: "",
-        _total_amount:"",
-        _comment:"",
-        _nombre_nuite:0,
-        _unite_price:0,
-        _paid_amount:0,
-        _reduction:0
+        account_id:"",
+        _total_amount: "",
+        _comment: "",
+        _nombre_nuite: 0,
+        _unite_price: 0,
+        _paid_amount: 0,
+        _reduction: 0
     })
 
     const change_info_fn = () => {
-        setForm({...form, 
+        setForm({
+            ...form,
             _nombre_nuite: getDaysBetweenDates(affectationData.start_date, affectationData.end_date),
             _unite_price: singleRoom.unite_price,
             _paid_amount: Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0),
@@ -48,6 +53,7 @@ function ClotureChambre({ hideForm, singleRoom }) {
             "room_id": singleRoom.id,
             "reduction": reduction,
             "comment": form.comment,
+            "account_id": form.account_id,
             "is_duplicted_data_exist": is_additional_information_active,
             "_total_amount": form._total_amount,
             "_comment": form._comment,
@@ -146,16 +152,16 @@ function ClotureChambre({ hideForm, singleRoom }) {
 
     function getCurrentDateTime() {
         const now = new Date();
-      
+
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
         const day = String(now.getDate()).padStart(2, '0');
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
-      
+
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-      }
+    }
 
     function getDaysBetweenDates(startDateString, endDateString) {
         // Convert strings to Date objects
@@ -168,31 +174,31 @@ function ClotureChambre({ hideForm, singleRoom }) {
         // Convert milliseconds to days
         const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
-        return daysDiff==0?1:daysDiff;
+        return daysDiff == 0 ? 1 : daysDiff;
     }
 
     function formatDate(date, includeTime = false) {
         const dateObj = new Date(date); // Convert to Date object if it's not already
-      
+
         if (isNaN(dateObj)) {
-          return "Invalid Date"; // Handle invalid date inputs
+            return "Invalid Date"; // Handle invalid date inputs
         }
-      
+
         const day = String(dateObj.getDate()).padStart(2, '0');
         const month = String(dateObj.getMonth() + 1).padStart(2, '0');
         const year = dateObj.getFullYear();
-      
+
         let formattedDate = `${day}/${month}/${year}`;
-      
+
         if (includeTime) {
-          const hours = String(dateObj.getHours()).padStart(2, '0');
-          const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-          const seconds = String(dateObj.getSeconds()).padStart(2, '0');
-          formattedDate += ` ${hours}:${minutes}:${seconds}`;
+            const hours = String(dateObj.getHours()).padStart(2, '0');
+            const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+            const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+            formattedDate += ` ${hours}:${minutes}:${seconds}`;
         }
-      
+
         return formattedDate;
-      }
+    }
 
     const handleDownloadPDF = (reference, client) => {
         const logoImage = new Image();
@@ -295,17 +301,17 @@ function ClotureChambre({ hideForm, singleRoom }) {
                         </tr>
                         </thead>
 
-                        ${is_additional_information_active?`
+                        ${is_additional_information_active ? `
                             <tbody>
                             ${detteData.map((item, index) => (
-                                `<tr>
+                `<tr>
                                     <td>${index + 1}</td>
                                     <td>${item.motif}</td>
                                     <td>1</td>
                                     <td>${item.loan_amount - item.paid_amount} $</td>
                                     <td>${item.loan_amount - item.paid_amount} $</td>
                                 </tr>`
-                            ))}
+            ))}
                             <tr>
                                 <td>${detteData.length + 1}</td>
                                 <td>${singleRoom.designation} - ${singleRoom.categorie}</td>
@@ -328,21 +334,21 @@ function ClotureChambre({ hideForm, singleRoom }) {
                             </tr>
                             <tr>
                                 <td colspan="3"></td>
-                                <td class="total">RESTE A PAYER:</td>
+                                <td class="total">SOLDE:</td>
                                 <td class="total">${(((form._nombre_nuite) * (form._unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (form._paid_amount) - (form._reduction))} $</td>
                             </tr>
                         </tfoot>
-                        `:`
+                        `: `
                             <tbody>
                             ${detteData.map((item, index) => (
-                                `<tr>
+                `<tr>
                                     <td>${index + 1}</td>
                                     <td>${item.motif}</td>
                                     <td>1</td>
                                     <td>${item.loan_amount - item.paid_amount} $</td>
                                     <td>${item.loan_amount - item.paid_amount} $</td>
                                 </tr>`
-                            ))}
+            ))}
                             <tr>
                                 <td>${detteData.length + 1}</td>
                                 <td>${singleRoom.designation} - ${singleRoom.categorie}</td>
@@ -365,7 +371,7 @@ function ClotureChambre({ hideForm, singleRoom }) {
                             </tr>
                             <tr>
                                 <td colspan="3"></td>
-                                <td class="total">RESTE A PAYER:</td>
+                                <td class="total">SOLDE:</td>
                                 <td class="total">${((getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0))) - reduction} $</td>
                             </tr>
                         </tfoot>`}
@@ -385,10 +391,30 @@ function ClotureChambre({ hideForm, singleRoom }) {
         };
     };
 
+    const getAccountOptions = async () => {
+        try {
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/getAllAccounts`, {
+                method: 'GET',
+                headers: headerRequest
+            });
+            const res = await response.json();
+            console.log("DATAs:", res.data)
+            if (res.data) {
+                setAccountData(res.data);
+            }
+            setLoader(false)
+        } catch (error) {
+            console.error("ERROR:", error);
+            setLoader(false)
+        }
+    }
+
     useEffect(() => {
         getDetteClientOptions()
         getTransactionOptions()
         getAffectationOptions()
+        getAccountOptions()
     }, [])
 
     return <>
@@ -400,11 +426,11 @@ function ClotureChambre({ hideForm, singleRoom }) {
                         {detteData.map((item, index) => <>
                             <li className="list-group-item" key={index}>{item.motif} : {item.loan_amount - item.paid_amount} $</li>
                         </>)}
-                        <li className="list-group-item">Nombre des nuités: <input value={form._nombre_nuite} onChange={(e) => setForm({...form, _nombre_nuite: e.target.value})} type="number" style={{ border: 0, width: 70 }} /> jours</li>
-                        <li className="list-group-item">Prix Unitaire de la chambre: <input value={form._unite_price} onChange={(e) => setForm({...form, _unite_price: e.target.value})} type="number" style={{ border: 0, width: 70 }} /> $</li>
+                        <li className="list-group-item">Nombre des nuités: <input value={form._nombre_nuite} onChange={(e) => setForm({ ...form, _nombre_nuite: e.target.value })} type="number" style={{ border: 0, width: 70 }} /> jours</li>
+                        <li className="list-group-item">Prix Unitaire de la chambre: <input value={form._unite_price} onChange={(e) => setForm({ ...form, _unite_price: e.target.value })} type="number" style={{ border: 0, width: 70 }} /> $</li>
                         <li className="list-group-item">Prix Total de location chambre: {(form._nombre_nuite) * (form._unite_price)} $</li>
-                        <li className="list-group-item">Montant payé: <input value={form._paid_amount} onChange={(e) => setForm({...form, _paid_amount: e.target.value})} type="number" style={{ border: 0, width: 70 }} /> $</li>
-                        <li className="list-group-item">Redution: <input value={form._reduction} onChange={(e) => setForm({...form, _reduction: e.target.value})} type="number" style={{ border: 0, width: 70 }} /> $</li>
+                        <li className="list-group-item">Montant payé: <input value={form._paid_amount} onChange={(e) => setForm({ ...form, _paid_amount: e.target.value })} type="number" style={{ border: 0, width: 70 }} /> $</li>
+                        <li className="list-group-item">Redution: <input value={form._reduction} onChange={(e) => setForm({ ...form, _reduction: e.target.value })} type="number" style={{ border: 0, width: 70 }} /> $</li>
                         <li className="list-group-item"><strong>RESTE A PAYER : {((form._nombre_nuite * (form._unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (form._paid_amount)) - (form._reduction)} $</strong></li>
                         <li className="list-group-item">Commentaire:
                             <textarea className="form-control py-11" id="fname" value={form._comment} onChange={(e) => { setForm({ ...form, _comment: e.target.value }) }}
@@ -422,11 +448,22 @@ function ClotureChambre({ hideForm, singleRoom }) {
                         <li className="list-group-item">Montant payé: {Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0)} $</li>
                         <li className="list-group-item">Redution: <input value={reduction} onChange={(e) => setReduction(e.target.value)} type="number" style={{ border: 0, width: 70 }} /></li>
                         <li className="list-group-item"><strong>RESTE A PAYER : {((getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0))) - reduction} $</strong></li>
+                        <li className="list-group-item">Compte : 
+                            <select id="" value={form.account_id} onChange={(e) => { setForm({ ...form, account_id: e.target.value }) }} style={{ border: 0, width: 150 }}>
+                                <option hidden>Selectionnez un compte</option>
+                                {accountData.map((item, index) => (
+                                    <option value={item.id} key={index}>{item.designation}</option>
+                                ))}
+                            </select>
+                        </li>
                         <li className="list-group-item">Commentaire:
                             <textarea className="form-control py-11" id="fname" value={form.comment} onChange={(e) => { setForm({ ...form, comment: e.target.value }) }}
                                 placeholder="Entrer un commentaire"></textarea>
                         </li>
-                        <li className="list-group-item"><i><a href="#" onClick={() => change_info_fn()}>Voulez-vous une facture avec d'autres informations ?</a></i></li>
+                        {permissions.includes("Gérer Autre Facture avec Autres Montants") ?(
+                            <li className="list-group-item"><i><a href="#" onClick={() => change_info_fn()}>Voulez-vous une facture avec d'autres informations ?</a></i></li>
+                        ):null}
+                        
                     </ul>}
 
             </div>

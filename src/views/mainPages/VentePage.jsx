@@ -22,6 +22,7 @@ function VentePage() {
     const [viewmoreVisible, setViewmoreVisible] = useState(false)
     const [singleClient, setSingleClient] = useState({})
     const [modalVisible, setModalVisible] = useState(false);
+    const [accountData, setAccountData] = useState([]);
     var now = new Date();
     var month = (now.getMonth() + 1);
     var day = now.getDate();
@@ -43,7 +44,7 @@ function VentePage() {
         customer_id: "",
         total_price: 0,
         sale_date: today,
-        account_id: 1,
+        account_id: "",
         comment: "",
         status: ""
     })
@@ -117,6 +118,25 @@ function VentePage() {
                 setEntries(res);
                 setDeviseData(res.devise)
                 setDeviseValue(Object.values(res.devise).filter(devise => devise.currency_type == 'devise_principale')[0])
+            }
+            setLoader(false)
+        } catch (error) {
+            console.error("ERROR:", error);
+            setLoader(false)
+        }
+    }
+
+    const getAccountOptions = async () => {
+        try {
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/getAllAccounts`, {
+                method: 'GET',
+                headers: headerRequest
+            });
+            const res = await response.json();
+            console.log("DATAs:", res.data)
+            if (res.data) {
+                setAccountData(res.data);
             }
             setLoader(false)
         } catch (error) {
@@ -238,7 +258,7 @@ function VentePage() {
 
             setpourchase_form((prevPourchaseForm) => [...prevPourchaseForm, { ...transit_form, index: pourchase_form.length }]);
             // setBaseForm({...base_form, paid_amount: Object.values(pourchase_form).reduce((acc, item) => acc + item.total_price, 0)})
-            console.log("FORM:", pourchase_form)
+            // console.log("FORM:", pourchase_form)
             // Calculate total brut_total_price
         }
     };
@@ -473,7 +493,7 @@ function VentePage() {
                     get_net_value(item.paid_amount)?.toString(),
                     item.comment?.toString(),
                 ]);
-                const itemDetailsHeaders = ['No', 'Date', 'Clients', 'Prix Total', 'Montant payé','Observation'];
+                const itemDetailsHeaders = ['No', 'Date', 'Clients', 'Prix Total', 'Montant payé', 'Observation'];
                 const columnWidths = [15, 35, 30, 30, 35, 40];
                 // Define table styles
                 const headerStyles = {
@@ -539,11 +559,19 @@ function VentePage() {
     }
 
     useEffect(() => {
-        getData()
-        getClientOptions()
-        getProductOptions()
-        getProductCategoryOptions()
-    }, [])
+        if (pourchase_form.length > 0) {
+            setBaseForm((prevBaseForm) => ({
+                ...prevBaseForm,
+                paid_amount: Object.values(pourchase_form).reduce((acc, item) => acc + item.total_price, 0)
+            }));
+        } else {
+            getData()
+            getClientOptions()
+            getProductOptions()
+            getProductCategoryOptions()
+            getAccountOptions()
+        }
+    }, [pourchase_form])
 
     if (viewmoreVisible == false) {
         return <>
@@ -620,8 +648,9 @@ function VentePage() {
                                                     {item.status == 0 ? <span className="plan-badge py-4 px-16 bg-main-600 text-white text-bold inset-inline-end-0 inset-block-start-0 mt-8 text-10">En attente</span> : ''}
                                                     {item.status == 1 ? <span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-10">Validées</span> : ''}
                                                 </td>
-                                                <td>
+                                                <td>{item.status == 0 ? (
                                                     <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
+                                                ) : null}
                                                     <button className="btn btn-success p-9 me-1" onClick={() => modelViewmore(item)}><i className="ph ph-eye text-white"></i></button>
                                                     <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
                                                 </td>
@@ -669,6 +698,15 @@ function VentePage() {
                                     <label htmlFor="fname" className="form-label mb-8 h6">Montant Payé</label>
                                     <input type="number" className="form-control py-11" id="fname" value={base_form.paid_amount} onChange={(e) => { setBaseForm({ ...base_form, paid_amount: e.target.value }) }}
                                         placeholder="Entrer un montant" />
+                                </div>
+                                <div className="col-sm-12 col-xs-12 mb-8">
+                                    <label htmlFor="email" className="form-label mb-8 h6">Compte <span className="text-danger">*</span></label>
+                                    <select id="" value={base_form.account_id} onChange={(e) => { setBaseForm({ ...base_form, account_id: e.target.value }) }} className="form-control py-11">
+                                        <option hidden>Selectionnez un compte</option>
+                                        {accountData.map((item, index) => (
+                                            <option value={item.id} key={index}>{item.designation}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 

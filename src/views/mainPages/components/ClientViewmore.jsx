@@ -9,6 +9,7 @@ function ClientViewmore({ hideForm, singleClient }) {
     const [data, setData] = useState([])
     const { setLoader } = useContext(MainContext);
     const [deviseData, setDeviseData] = useState([]);
+    const [accountData, setAccountData] = useState([]);
     const [deviseValue, setDeviseValue] = useState({});
     const [formVisible, seteFormVisible] = useState(false)
 
@@ -24,6 +25,7 @@ function ClientViewmore({ hideForm, singleClient }) {
     const [form, setForm] = useState({
         transaction_date: today,
         paid_amount: 0,
+        account_id:"",
         customer_id: singleClient.id
     })
 
@@ -239,8 +241,28 @@ function ClientViewmore({ hideForm, singleClient }) {
         return formattedDate;
     }
 
+    const getAccountOptions = async () => {
+        try {
+            setLoader(true)
+            const response = await fetch(`${BaseUrl}/getAllAccounts`, {
+                method: 'GET',
+                headers: headerRequest
+            });
+            const res = await response.json();
+            console.log("DATAs:", res.data)
+            if (res.data) {
+                setAccountData(res.data);
+            }
+            setLoader(false)
+        } catch (error) {
+            console.error("ERROR:", error);
+            setLoader(false)
+        }
+    }
+
     useEffect(() => {
         getData()
+        getAccountOptions()
     }, [])
 
     return <>
@@ -360,14 +382,23 @@ function ClientViewmore({ hideForm, singleClient }) {
             </Modal.Header>
             <Modal.Body>
                 <div className="col-sm-12 col-xs-12">
-                    <label htmlFor="transaction_date" className="form-label mb-8 h6">Date de transaction</label>
+                    <label htmlFor="transaction_date" className="form-label h6">Date de transaction</label>
                     <input type="date" className="form-control py-11" id="transaction_date" value={form.transaction_date} onChange={(e) => { setForm({ ...form, transaction_date: e.target.value }) }}
                         placeholder="Entrer une date" />
                 </div>
-                <div className="col-sm-12 col-xs-12">
+                <div className="col-sm-12 col-xs-12 mb-8">
                     <label htmlFor="amount" className="form-label mb-8 h6">Montant a payer</label>
                     <input type="number" className="form-control py-11" id="amount" value={form.paid_amount} onChange={(e) => { setForm({ ...form, paid_amount: e.target.value }) }}
                         placeholder="Entrer un montant" />
+                </div>
+                <div className="col-sm-12 col-xs-12 mb-8">
+                    <label htmlFor="email" className="form-label mb-8 h6">Compte <span className="text-danger">*</span></label>
+                    <select id="" value={form.account_id} onChange={(e) => { setForm({ ...form, account_id: e.target.value }) }} className="form-control py-11">
+                        <option hidden>Selectionnez un compte</option>
+                        {accountData.map((item, index) => (
+                            <option value={item.id} key={index}>{item.designation}</option>
+                        ))}
+                    </select>
                 </div>
             </Modal.Body>
             <Modal.Footer>
