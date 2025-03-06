@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import { MainContext } from "../../config/MainContext"
 import Pagination from "../../pagination/Pagination"
-import ApprovisionementForm from "./components/ApprovisionementForm"
 import KitchenSupplyForm from "./components/KitchenSupplyForm"
 
 function CommandKitchenPage() {
@@ -17,7 +16,9 @@ function CommandKitchenPage() {
 
     const hideForm = () => {
         seteFormVisible(false)
-        getData();
+        getPendingData();
+        getActivatedData();
+        getRejectedData();
         Object.keys(singleClient).forEach(function (key, index) {
             delete singleClient[key];
         });
@@ -82,15 +83,6 @@ function CommandKitchenPage() {
             setLoader(false)
         }
     }
-
-    const searchDataFn = (searchData) => {
-        if (searchData) {
-            let term = searchData.toLowerCase();
-            getData(1, term);
-        } else {
-            getData();
-        }
-    };
 
     const getResult = (pages) => {
 

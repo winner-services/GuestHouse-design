@@ -304,14 +304,14 @@ function ClotureChambre({ hideForm, singleRoom }) {
                         ${is_additional_information_active ? `
                             <tbody>
                             ${detteData.map((item, index) => (
-                `<tr>
+                                `<tr>
                                     <td>${index + 1}</td>
                                     <td>${item.motif}</td>
                                     <td>1</td>
                                     <td>${item.loan_amount - item.paid_amount} $</td>
                                     <td>${item.loan_amount - item.paid_amount} $</td>
                                 </tr>`
-            ))}
+                            ))}
                             <tr>
                                 <td>${detteData.length + 1}</td>
                                 <td>${singleRoom.designation} - ${singleRoom.categorie}</td>
@@ -341,14 +341,14 @@ function ClotureChambre({ hideForm, singleRoom }) {
                         `: `
                             <tbody>
                             ${detteData.map((item, index) => (
-                `<tr>
+                                `<tr>
                                     <td>${index + 1}</td>
                                     <td>${item.motif}</td>
                                     <td>1</td>
                                     <td>${item.loan_amount - item.paid_amount} $</td>
                                     <td>${item.loan_amount - item.paid_amount} $</td>
                                 </tr>`
-            ))}
+                            ))}
                             <tr>
                                 <td>${detteData.length + 1}</td>
                                 <td>${singleRoom.designation} - ${singleRoom.categorie}</td>
@@ -371,8 +371,13 @@ function ClotureChambre({ hideForm, singleRoom }) {
                             </tr>
                             <tr>
                                 <td colspan="3"></td>
-                                <td class="total">SOLDE:</td>
+                                <td class="total">MONTANT PAYE:</td>
                                 <td class="total">${((getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0)) - (Object.values(transasctionData).reduce((acc, item) => acc + (item.amount), 0))) - reduction} $</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td class="total">TOTAL:</td>
+                                <td class="total">${((getDaysBetweenDates(affectationData.start_date, affectationData.end_date) * (singleRoom.unite_price)) + (Object.values(detteData).reduce((acc, item) => acc + (item.loan_amount), 0))) - reduction} $</td>
                             </tr>
                         </tfoot>`}
                         
