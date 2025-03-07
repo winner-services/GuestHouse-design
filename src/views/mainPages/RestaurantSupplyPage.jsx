@@ -107,9 +107,15 @@ function RestaurantSupplyPage() {
     const searchDataFn = (searchData) => {
         if (searchData) {
             let term = searchData.toLowerCase();
-            getData(1,term);
+            getAllData(1,term);
+            getPendingData(1,term);
+            getActivatedData(1,term);
+            getRejectedData(1,term);
         } else {
-            getData();
+            getAllData();
+            getPendingData();
+            getActivatedData();
+            getRejectedData();
         }
     };
 
