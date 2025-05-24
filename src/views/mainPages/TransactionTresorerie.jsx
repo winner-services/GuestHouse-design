@@ -335,8 +335,8 @@ function TransactionTresorerie() {
                         Q.les volcans, av.les messagers N° 13-B<br>
                         RCCM: 22-A-01622<br>
                         Impôt : A2315632S<br>
-                        +243999023794<br>
-                        johnservices@gmail.com<br>
+                        +243997163443<br>
+                        johnservicesmotel@gmail.com<br>
                         <span>Date: ${formatDate(model.transaction_date)}</span>
                         <h2>FACTURE No: ${model.reference}</h2>
                     </div>

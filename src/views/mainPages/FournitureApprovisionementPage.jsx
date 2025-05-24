@@ -235,8 +235,8 @@ function FournitureApprovisionementPage() {
                 pdf.text('Q.les volcans, av.les messagers N° 13-B', 69, 32);
                 pdf.text('RCCM: 22-A-01622', 86, 37);
                 pdf.text('Impôt : A2315632S', 87, 42);
-                pdf.text('+243999023794', 90, 47);
-                pdf.text('johnservices@gmail.com', 83, 52);
+                pdf.text('+243997163443', 90, 47);
+                pdf.text('johnservicesmotel@gmail.com', 83, 52);
 
                 pdf.setFontSize(15);
                 pdf.setFont('custom', 'bold');

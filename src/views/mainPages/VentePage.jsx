@@ -380,8 +380,8 @@ function VentePage() {
                         Q.les volcans, av.les messagers N° 13-B<br>
                         RCCM: 22-A-01622<br>
                         Impôt : A2315632S<br>
-                        +243999023794<br>
-                        johnservices@gmail.com<br>
+                        +243997163443<br>
+                        johnservicesmotel@gmail.com<br>
                         <span>Date: ${formatDate(today)} ${now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds()}</span>
                         <h2>FACTURE No: ${reference}</h2>
                     </div>
@@ -471,8 +471,8 @@ function VentePage() {
                 pdf.text('Q.les volcans, av.les messagers N° 13-B', 69, 32);
                 pdf.text('RCCM: 22-A-01622', 86, 37);
                 pdf.text('Impôt : A2315632S', 87, 42);
-                pdf.text('+243999023794', 90, 47);
-                pdf.text('johnservices@gmail.com', 83, 52);
+                pdf.text('+243997163443', 90, 47);
+                pdf.text('johnservicesmotel@gmail.com', 83, 52);
 
                 pdf.setFontSize(15);
                 pdf.setFont('custom', 'bold');

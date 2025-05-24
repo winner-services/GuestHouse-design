@@ -175,8 +175,8 @@ function ReservationChambreForm({hideForm, singleRoom}) {
                         Q.les volcans, av.les messagers N° 13-B<br>
                         RCCM: 22-A-01622<br>
                         Impôt : A2315632S<br>
-                        +243999023794<br>
-                        johnservices@gmail.com<br>
+                        +243997163443<br>
+                        johnservicesmotel@gmail.com<br>
                         <span>Date: ${formatDate(today)} ${now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds()}</span>
                         <h2>FACTURE No: ${reference}</h2>
                     </div>

@@ -53,7 +53,7 @@ function LoginPage() {
         <div className="side-overlay"></div>
         <section className="auth d-flex">
             <div className="auth-left bg-main-50 flex-center p-24">
-                <img src="assets/images/thumbs/auth-img1.png" alt="" />
+                <img src="/home.jpg" alt="" />
             </div>
             <div className="auth-right py-40 px-24 flex-center flex-column">
                 <div className="auth-right__inner mx-auto w-100">
