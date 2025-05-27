@@ -293,7 +293,8 @@ function FourniturePage() {
                                 <th className="fixed-width"> #</th>
                                 <th className="h6 text-gray-300">Designation</th>
                                 <th className="h6 text-gray-300">Quantite</th>
-                                <th className="h6 text-gray-300">Valeur</th>
+                                <th className="h6 text-gray-300">P.U</th>
+                                <th className="h6 text-gray-300">P.T</th>
                                 <th className="h6 text-gray-300">Actions</th>
                             </tr>
                         </thead>
@@ -306,6 +307,7 @@ function FourniturePage() {
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.designation}</span></td>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity}</span></td>
                                             <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.value)}</span></td>
+                                            <td><span className="h6 mb-0 fw-medium text-gray-300">{get_net_value(item.value * item.quantity)}</span></td>
                                             <td>
                                                 <button className="btn btn-main p-9 me-1" onClick={() => modelUpdate(item)}><i className="ph ph-pen text-white"></i></button>
                                                 <button className="btn btn-danger p-9" onClick={() => modelDette(item)}><i className="ph ph-trash text-white"></i></button>
@@ -313,7 +315,7 @@ function FourniturePage() {
                                         </tr>
                                     ))
                                 ) : (<tr>
-                                    <td colSpan={7}>
+                                    <td colSpan={8}>
                                         <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
                                     </td>
                                 </tr>)
