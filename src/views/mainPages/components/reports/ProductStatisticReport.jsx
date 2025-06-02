@@ -37,8 +37,8 @@ function ProductStatisticReport({ hideForm, form }) {
     }
 
     const get_net_value = (value) => {
-        let result = Number(value) * Number(deviseValue.conversion_amount)
-        return `${result} ${deviseValue.symbol}`
+        let result = Number(value) * Number(deviseValue?.conversion_amount)
+        return `${result} ${deviseValue?.symbol}`
     }
 
     function formatDate(date, includeTime = false) {

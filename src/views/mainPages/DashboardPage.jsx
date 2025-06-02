@@ -129,8 +129,8 @@ function DashboardPage() {
     }
 
     const get_net_value = (value) => {
-        let result = Number(value) * Number(deviseValue.conversion_amount)
-        return `${result} ${deviseValue.symbol}`
+        let result = Number(value) * Number(deviseValue?.conversion_amount)
+        return `${result} ${deviseValue?.symbol}`
     }
 
     const change_first_date = (start_date) => {
@@ -326,7 +326,7 @@ function DashboardPage() {
                                                     </tr>
                                                 ))
                                             ) : (<tr>
-                                                <td colSpan={3}>
+                                                <td colSpan={4}>
                                                     <i className="h6 mb-0 fw-medium text-gray-300 d-flex justify-content-center">Aucun élément trouvé</i>
                                                 </td>
                                             </tr>)

@@ -163,8 +163,8 @@ function VentePage() {
     }
 
     const get_net_value = (value) => {
-        let result = Number(value) * Number(deviseValue.conversion_amount)
-        return `${result} ${deviseValue.symbol}`
+        let result = Number(value) * Number(deviseValue?.conversion_amount)
+        return `${result} ${deviseValue?.symbol}`
     }
 
     const searchDataFn = (searchData) => {

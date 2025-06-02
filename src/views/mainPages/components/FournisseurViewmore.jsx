@@ -66,8 +66,8 @@ function FournisseurViewmore({ hideForm, singleSupplier }) {
 
     const get_net_value = (value) => {
         if (value) {
-            let result = Number(value) * Number(deviseValue.conversion_amount)
-            return `${result} ${deviseValue.symbol}`
+            let result = Number(value) * Number(deviseValue?.conversion_amount)
+            return `${result} ${deviseValue?.symbol}`
         } else {
             return `0 $`
         }
