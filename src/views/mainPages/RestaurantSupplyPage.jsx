@@ -107,10 +107,10 @@ function RestaurantSupplyPage() {
     const searchDataFn = (searchData) => {
         if (searchData) {
             let term = searchData.toLowerCase();
-            getAllData(1,term);
-            getPendingData(1,term);
-            getActivatedData(1,term);
-            getRejectedData(1,term);
+            getAllData(1, term);
+            getPendingData(1, term);
+            getActivatedData(1, term);
+            getRejectedData(1, term);
         } else {
             getAllData();
             getPendingData();
@@ -129,26 +129,62 @@ function RestaurantSupplyPage() {
 
     function formatDate(date, includeTime = false) {
         const dateObj = new Date(date); // Convert to Date object if it's not already
-      
+
         if (isNaN(dateObj)) {
-          return "Invalid Date"; // Handle invalid date inputs
+            return "Invalid Date"; // Handle invalid date inputs
         }
-      
+
         const day = String(dateObj.getDate()).padStart(2, '0');
         const month = String(dateObj.getMonth() + 1).padStart(2, '0');
         const year = dateObj.getFullYear();
-      
+
         let formattedDate = `${day}/${month}/${year}`;
-      
+
         if (includeTime) {
-          const hours = String(dateObj.getHours()).padStart(2, '0');
-          const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-          const seconds = String(dateObj.getSeconds()).padStart(2, '0');
-          formattedDate += ` ${hours}:${minutes}:${seconds}`;
+            const hours = String(dateObj.getHours()).padStart(2, '0');
+            const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+            const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+            formattedDate += ` ${hours}:${minutes}:${seconds}`;
         }
-      
+
         return formattedDate;
-      }
+    }
+
+    const updateData = async (status = "", model) => {
+
+        let url = ''
+        let method = ''
+        if (status == "check") {
+            url = `validateOrder/${model.id}`
+            method = 'PUT'
+        } else {
+            url = `rejectOrder/${model.id}`
+            method = 'PUT'
+        }
+
+        setLoader(true)
+        try {
+            const response = await fetch(`${BaseUrl}/${url}`, {
+                method: method,
+                headers: headerRequest,
+            });
+            const res = await response.json();
+            if (res.success) {
+                toastr.success("Une commande a ete mis a jour avec success", "Success");
+                setLoader(false)
+                getPendingData()
+                getActivatedData()
+                getRejectedData()
+            } else {
+                toastr.error("Veillez reessayez", "Erreur");
+                setLoader(false)
+                // window.location.reload()
+            }
+        } catch (error) {
+            toastr.error("Veillez reessayez", "Erreur");
+            setLoader(false)
+        }
+    }
 
     useEffect(() => {
         getAllData()
@@ -252,9 +288,9 @@ function RestaurantSupplyPage() {
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity} {item.unit}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.agent}</span></td>
                                                                 <td>
-                                                                    {item.status=='Pending'?<span className="plan-badge py-4 px-16 bg-main-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">En attente</span>:''}
-                                                                    {item.status=='Validated'?<span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Validées</span>:''}
-                                                                    {item.status=='Rejected'?<span className="plan-badge py-4 px-16 bg-danger-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Rejetées</span>:''}
+                                                                    {item.status == 'Pending' ? <span className="plan-badge py-4 px-16 bg-main-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">En attente</span> : ''}
+                                                                    {item.status == 'Validated' ? <span className="plan-badge py-4 px-16 bg-warning-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Validées</span> : ''}
+                                                                    {item.status == 'Rejected' ? <span className="plan-badge py-4 px-16 bg-danger-600 text-white inset-inline-end-0 inset-block-start-0 mt-8 text-15">Rejetées</span> : ''}
                                                                 </td>
                                                             </tr>
                                                         ))
@@ -308,8 +344,8 @@ function RestaurantSupplyPage() {
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.quantity} {item.unit}</span></td>
                                                                 <td><span className="h6 mb-0 fw-medium text-gray-300">{item.agent}</span></td>
                                                                 <td>
-                                                                    <button className="btn btn-success p-9 me-1" onClick={() => updateData("check",item)}><i className="ph ph-check text-white"></i></button>
-                                                                    <button className="btn btn-danger p-9" onClick={() => updateData("reject",item)}><i className="ph ph-trash text-white"></i></button>
+                                                                    <button className="btn btn-success p-9 me-1" onClick={() => updateData("check", item)}><i className="ph ph-check text-white"></i></button>
+                                                                    <button className="btn btn-danger p-9" onClick={() => updateData("reject", item)}><i className="ph ph-trash text-white"></i></button>
                                                                 </td>
                                                             </tr>
                                                         ))

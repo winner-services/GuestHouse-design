@@ -86,6 +86,7 @@ function RoleUserPage() {
                 Object.keys(form).forEach(function (key, index) {
                     delete form[key];
                 });
+                delete form.id
                 setLoader(false)
             } else {
                 toastr.error("Veillez reessayez", "Erreur");

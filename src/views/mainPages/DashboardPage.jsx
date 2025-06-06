@@ -129,8 +129,13 @@ function DashboardPage() {
     }
 
     const get_net_value = (value) => {
-        let result = Number(value) * Number(deviseValue?.conversion_amount)
-        return `${result} ${deviseValue?.symbol}`
+        if (value) {
+            let result = Number(value) * Number(deviseValue?.conversion_amount)
+            return `${result} ${deviseValue?.symbol}`
+        } else {
+            return `0 $`
+        }
+
     }
 
     const change_first_date = (start_date) => {
